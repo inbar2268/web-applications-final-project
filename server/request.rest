@@ -1,0 +1,85 @@
+
+### create post 
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+    "title": "hello ",
+    "owner": "inbar",
+    "content": "hiii"
+}
+
+### get all posts
+GET http://localhost:3000/posts
+
+
+### get post by id
+GET http://localhost:3000/posts/677c2857652da2a65a433f3c
+
+### update post
+PUT http://localhost:3000/posts/677c2857652da2a65a433f3c
+Content-Type: application/json
+
+{
+    "title": "hello",
+    "owner": "hila",
+    "content": "be happy"
+}
+###
+### get comments by post id
+GET http://localhost:3000/posts/byOwner/inbar
+
+### create comment
+POST http://localhost:3000/comments
+Content-Type: application/json
+
+{
+    "message": "amazing post!",
+    "owner": "hadar",
+    "postId": "673ed35a771174faa11b8a96"
+}
+
+### update comment
+PUT  http://localhost:3000/comments/677d3b9923eb46000c503a1e
+Content-Type: application/json
+
+{
+    "message": "worst post ever!",
+    "owner": "hadar",
+    "postId": "673ed35a771174faa11b8a96"
+}
+### get comment by id
+GET http://localhost:3000/comments/677d3b9923eb46000c503a1e
+
+### delete comment
+DELETE  http://localhost:3000/comments/677ca96014a2c4023efee164
+
+### get comments by post id
+GET http://localhost:3000/comments/byPost/673ed35a771174faa11b8a96
+
+### create user
+POST  http://localhost:3000/users
+Content-Type: application/json
+
+{
+    "username": "hadar21",
+    "email": "hadar@gmail.com",
+    "password": "fwewef",
+    "posts": ["333","rthrher"]
+}
+
+### update user
+PUT  http://localhost:3000/users/6790fa3bed69a33b8ea6b4ca
+Content-Type: application/json
+
+{
+    "username": "inbar",
+    "email": "hadar@gmail.com",
+    "password": "fwewef"
+}
+
+### get user by id
+GET http://localhost:3000/users/6790fc60c191563c3368c14e
+
+### delete user
+DELETE  http://localhost:3000/users/678a6674815cc2fb3b9b9a6f
