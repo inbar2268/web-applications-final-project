@@ -1,0 +1,7 @@
+export interface User {
+    name: string,
+    password: string,
+    email: string,
+    profileImage:string,
+    _id: string
+}
