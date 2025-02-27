@@ -7,8 +7,7 @@ import { Document } from 'mongoose';
 
 const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, username, password } = req.body;
-    const imagePath = req.file?.path;  
+    const { profilePicture, email, username, password } = req.body;
 
     if (!email || !username || !password) {
         const message =  'Missing required fields';
@@ -32,7 +31,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
       email,
       username,
       password: hashedPassword,
-      profileImage: imagePath
+      profilePicture
     });
 
     res.status(200).json(newUser); 
