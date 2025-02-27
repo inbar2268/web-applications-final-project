@@ -4,7 +4,7 @@ export interface IUser {
   username: string;
   email: string;
   password: string;
-  profilePicture: string;
+  profilePicture?: string;
   _id?: string;
   refreshToken?: string[];
 }
