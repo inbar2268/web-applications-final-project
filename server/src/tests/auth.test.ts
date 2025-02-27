@@ -29,7 +29,7 @@ const testUser: User = {
   username: "test1",
   email: "test@user.com",
   password: "testpassword",
-  profileImage: ""
+  profilePicture: ""
 };
 
 describe("Auth Tests", () => {

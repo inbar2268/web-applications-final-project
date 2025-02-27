@@ -4,7 +4,7 @@ export interface IUser {
   username: string;
   email: string;
   password: string;
-  profileImage: string;
+  profilePicture: string;
   _id?: string;
   refreshToken?: string[];
 }
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema<IUser>({
     type: String,
     required: true,
   }, 
-  profileImage: {
+  profilePicture: {
     type: String,
     required: false,
   },   
