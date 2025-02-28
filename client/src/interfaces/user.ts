@@ -1,7 +1,7 @@
-export interface User {
+export interface IUser {
     name: string,
     password: string,
     email: string,
-    profileImage:string,
+    profilePicture:string,
     _id: string
 }
