@@ -15,7 +15,7 @@ import { useState } from "react";
 import Logo from "../assets/Logo.svg";
 const pages = [{ name: "User", path: "/user" }];
 
-const settings = ["Logout"];
+const settings = ["Logout", "Sign In"];
 
 function Layout() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -159,13 +159,17 @@ function Layout() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography sx={{ textAlign: "center" }}>
-                      {setting}
-                    </Typography>
-                  </MenuItem>
-                ))}
+                  {settings.map((setting) => (
+                  <MenuItem 
+                    key={setting} 
+                    onClick={handleCloseUserMenu}
+                    component={setting === "Sign In" ? "a" : "li"}
+                    href={setting === "Sign In" ? "/signin" : undefined}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {setting}
+                  </Typography>
+                </MenuItem>
+              ))}
               </Menu>
             </Box>
           </Toolbar>
