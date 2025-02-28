@@ -4,6 +4,7 @@ import { loginUser } from '../services/userService';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {Box, Button, Container, Divider, TextField, Typography} from '@mui/material';
 import { schema, IFormData} from '../interfaces/signInForm';
+import { useNavigate } from 'react-router-dom';
 
 
 const SignIn: FC = () => {
@@ -12,11 +13,14 @@ const SignIn: FC = () => {
   });
   const [errorMessage, setErrorMessage] = useState<string>(''); 
 
+  const navigate = useNavigate();
 
   const onSubmit = (data: IFormData) => {
     setErrorMessage('');
     loginUser(data).then(response => {
       console.log('login successful:', response);
+      navigate('/');
+
     }).catch(error => {
       console.error('login failed:', error);
       setErrorMessage('Incorrect login credentials');

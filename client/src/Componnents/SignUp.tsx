@@ -4,22 +4,20 @@ import { registerUser } from '../services/userService';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {Box, Button, Container, TextField, Typography} from '@mui/material';
 import { schema, IFormData} from '../interfaces/signUpFrom';
-import { IUser } from '../interfaces/user';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp: FC = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<IFormData>({
     resolver: zodResolver(schema),
   });
 
+  const navigate = useNavigate();
+
   const onSubmit = (data: IFormData) => {
     console.log('Form data:', data);
-    const user: IUser = {
-      username: data.username,
-      email: data.email,
-      password: data.password,
-    };
-    registerUser(user).then(response => {
+    registerUser(data).then(response => {
       console.log('Registration successful:', response);
+      navigate('/signin');
     }).catch(error => {
       console.error('Registration failed:', error);
     });

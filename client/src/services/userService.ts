@@ -1,8 +1,9 @@
 import apiClient from "./apiClient";
 import {IUser} from "../interfaces/user"
-import { IFormData} from '../interfaces/signInForm'
+import { IFormData as ILogin } from '../interfaces/signInForm';
+import { IFormData as IRegister} from '../interfaces/signInForm';
 
-export const loginUser = (data: IFormData) => {
+export const loginUser = (data: ILogin) => {
     return new Promise<IUser>((resolve, reject) => {
         console.log("login user")
         console.log(data)
@@ -16,10 +17,10 @@ export const loginUser = (data: IFormData) => {
     })
 }
 
-export const registerUser = (user: IUser) => {
+export const registerUser = (data: IRegister) => {
     return new Promise<IUser>((resolve, reject) => {
         console.log("regitering user")
-        apiClient.post("/auth/register", user).then((response)=> {
+        apiClient.post("/auth/register", data).then((response)=> {
             console.log(response)
             resolve(response.data)
         }).catch((error)=>{
