@@ -9,7 +9,10 @@ export const loginUser = (data: ILogin) => {
         console.log(data)
         apiClient.post("/auth/login", data).then((response)=> {
             console.log(response)
-            resolve(response.data)
+            storeAccessToken(response.data.accessToken)
+            storeRefreshToken(response.data.refreshToken)
+            storeUserId(response.data._id)
+            resolve(response.data);
         }).catch((error)=>{
             console.log(error)
             reject(error)
@@ -29,3 +32,22 @@ export const registerUser = (data: IRegister) => {
         })
     })
 }
+
+export const logout = () => {
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("userId");
+}
+
+const storeAccessToken = (accessToken: string) =>{
+    sessionStorage.setItem("accessToken", accessToken);
+}
+
+const storeUserId = (userId: string) =>{
+    sessionStorage.setItem("userId", userId);
+}
+
+const storeRefreshToken = (refreshToken: string) =>{
+    sessionStorage.setItem("refreshToken", refreshToken);
+}
+

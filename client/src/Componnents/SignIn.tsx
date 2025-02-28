@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { loginUser } from '../services/userService';
+import { loginUser } from '../services/authService';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {Box, Button, Container, Divider, TextField, Typography} from '@mui/material';
 import { schema, IFormData} from '../interfaces/signInForm';
@@ -17,11 +17,10 @@ const SignIn: FC = () => {
 
   const onSubmit = (data: IFormData) => {
     setErrorMessage('');
-    loginUser(data).then(response => {
+    loginUser(data).then((response) => {
       console.log('login successful:', response);
       navigate('/');
-
-    }).catch(error => {
+    }).catch((error) => {
       console.error('login failed:', error);
       setErrorMessage('Incorrect login credentials');
     });

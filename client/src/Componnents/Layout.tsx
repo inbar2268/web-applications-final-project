@@ -1,4 +1,4 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -13,11 +13,13 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { useState } from "react";
 import Logo from "../assets/Logo.svg";
-const pages = [{ name: "User", path: "/user" }];
+import { logout } from "../services/authService";
 
-const settings = ["Logout", "Sign In"];
+const pages = [{ name: "User", path: "/user" }];
+const settings = ["Sign In", "Logout"];
 
 function Layout() {
+  const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -32,6 +34,11 @@ function Layout() {
   };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleLogoutClick = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -162,7 +169,12 @@ function Layout() {
                   {settings.map((setting) => (
                   <MenuItem 
                     key={setting} 
-                    onClick={handleCloseUserMenu}
+                    onClick={() => {
+                      handleCloseUserMenu();
+                      if (setting === "Logout") {
+                        handleLogoutClick();
+                      }
+                    }}
                     component={setting === "Sign In" ? "a" : "li"}
                     href={setting === "Sign In" ? "/signin" : undefined}>
                   <Typography sx={{ textAlign: "center" }}>

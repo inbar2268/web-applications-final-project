@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import { registerUser } from '../services/userService';
+import { registerUser } from '../services/authService';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {Box, Button, Container, TextField, Typography} from '@mui/material';
 import { schema, IFormData} from '../interfaces/signUpFrom';
@@ -15,10 +15,10 @@ const SignUp: FC = () => {
 
   const onSubmit = (data: IFormData) => {
     console.log('Form data:', data);
-    registerUser(data).then(response => {
+    registerUser(data).then((response) => {
       console.log('Registration successful:', response);
       navigate('/signin');
-    }).catch(error => {
+    }).catch((error) => {
       console.error('Registration failed:', error);
     });
   };
