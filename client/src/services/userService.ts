@@ -15,3 +15,16 @@ export const loginUser = (data: IFormData) => {
         })
     })
 }
+
+export const registerUser = (user: IUser) => {
+    return new Promise<IUser>((resolve, reject) => {
+        console.log("regitering user")
+        apiClient.post("/auth/register", user).then((response)=> {
+            console.log(response)
+            resolve(response.data)
+        }).catch((error)=>{
+            console.log(error)
+            reject(error)
+        })
+    })
+}

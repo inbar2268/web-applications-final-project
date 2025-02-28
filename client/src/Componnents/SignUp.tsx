@@ -1,25 +1,27 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import { loginUser } from '../services/userService';
+import { registerUser } from '../services/userService';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {Box, Button, Container, Divider, TextField, Typography} from '@mui/material';
-import { schema, IFormData} from '../interfaces/signInForm';
+import {Box, Button, Container, TextField, Typography} from '@mui/material';
+import { schema, IFormData} from '../interfaces/signUpFrom';
+import { IUser } from '../interfaces/user';
 
-
-const SignIn: FC = () => {
+const SignUp: FC = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<IFormData>({
     resolver: zodResolver(schema),
   });
-  const [errorMessage, setErrorMessage] = useState<string>(''); 
-
 
   const onSubmit = (data: IFormData) => {
-    setErrorMessage('');
-    loginUser(data).then(response => {
-      console.log('login successful:', response);
+    console.log('Form data:', data);
+    const user: IUser = {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+    };
+    registerUser(user).then(response => {
+      console.log('Registration successful:', response);
     }).catch(error => {
-      console.error('login failed:', error);
-      setErrorMessage('Incorrect login credentials');
+      console.error('Registration failed:', error);
     });
   };
 
@@ -54,13 +56,14 @@ const SignIn: FC = () => {
             WebkitTextFillColor: 'transparent'
           }}
         >
-          Sign In
+          Sign Up
         </Typography>
         
         <TextField
           margin="normal"
           label="Username"
           fullWidth
+          required
           error={!!errors.username}
           helperText={errors.username ? errors.username.message : ''}
           {...register('username')}
@@ -77,11 +80,35 @@ const SignIn: FC = () => {
             }
           }}
         />
-        
+
+        <TextField
+          margin="normal"
+          label="Email"
+          fullWidth
+          required
+          type="email"
+          error={!!errors.email}
+          helperText={errors.email ? errors.email.message : ''}
+          {...register('email')}
+          sx={{ 
+            mb: 2,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
+              '&:hover fieldset': {
+                borderColor: 'primary.main',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'primary.main',
+              }
+            }
+          }}
+        />
+
         <TextField
           margin="normal"
           label="Password"
           fullWidth
+          required
           type="password"
           error={!!errors.password}
           helperText={errors.password ? errors.password.message : ''}
@@ -99,7 +126,6 @@ const SignIn: FC = () => {
             }
           }}
         />
-        {errorMessage && <Typography color="error">{errorMessage}</Typography>}
 
         <Button
           variant="contained"
@@ -113,29 +139,25 @@ const SignIn: FC = () => {
             fontWeight: 'bold',
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            background: '#E8B08E',
+            background: ' #E8B08E',
             transition: 'all 0.3s ease',
             '&:hover': {
               boxShadow: '0 6px 15px rgba(0, 0, 0, 0.2)',
               transform: 'translateY(-2px)'
             }
           }}
-        
         >
-          Sign in
+          Sign Up
         </Button>
         
-        <Divider sx={{ width: '100%', my: 3 }}>
-          <Typography sx={{ px: 2, color: 'text.secondary' }}>or</Typography>
-        </Divider>
         
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="body1">
-            Don't have an account?{' '}
+            Already have an account?{' '}
             <Button
               variant="text"
               component="a"
-              href="/signup"
+              href="/signin"
               sx={{ 
                 textTransform: 'none',
                 fontWeight: 'bold',
@@ -146,14 +168,14 @@ const SignIn: FC = () => {
                   backgroundColor: 'transparent'
                 }
               }}
-                >
-                Sign Up
-              </Button>
+            >
+              Sign In
+            </Button>
           </Typography>
         </Box>
       </Box>
-    </Container>
+    </Container>  
   );
 };
 
-export default SignIn;
+export default SignUp;
