@@ -9,17 +9,17 @@ import {
 import "./App.css";
 import { mockPosts } from "../mocData";
 import { useEffect, useState } from "react";
-import { Post } from "../interfaces/post";
+import { IPost } from "../interfaces/post";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 function Home() {
-  const [shuffledItem, setShuffeldItem] = useState<Post[]>(mockPosts);
+  const [shuffledItem, setShuffeldItem] = useState<IPost[]>(mockPosts);
 
   useEffect(() => {
     setShuffeldItem(shuffleArray(shuffledItem));
   }, []);
 
-  function shuffleArray(array: Post[]) {
+  function shuffleArray(array: IPost[]) {
     return [...array].sort(() => Math.random() - 0.5);
   }
   return (
