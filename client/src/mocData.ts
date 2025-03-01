@@ -160,73 +160,83 @@ export const mockPosts: IPost[] = [
 
 export const mockUsers: IUser[] = [
   {
-    username: "Oren Cohen",
+    username: "oren_cohen",
     password: "password123",
     email: "oren_cohen@example.com",
-    profilePicture: "https://example.com/oren-cohen.jpg",
+    profilePicture:
+      "https://plus.unsplash.com/premium_photo-1689977968861-9c91dbb16049?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D",
     _id: "oren_cohen_1",
   },
   {
-    username: "Shira Levi",
+    username: "shira_levi",
     password: "password123",
     email: "shira_levi@example.com",
-    profilePicture: "https://example.com/shira-levi.jpg",
+    profilePicture:
+      "https://www.perfocal.com/blog/content/images/2021/01/Perfocal_17-11-2019_TYWFAQ_100_standard-3.jpg",
     _id: "shira_levi_1",
   },
   {
-    username: "David Friedman",
+    username: "david_friedman",
     password: "password123",
     email: "david_friedman@example.com",
-    profilePicture: "https://example.com/david-friedman.jpg",
+    profilePicture:
+      "https://cdn.expertphotography.com/wp-content/uploads/2018/10/cool-profile-pictures-fake-smile.jpg",
     _id: "david_friedman_1",
   },
   {
-    username: "Noa Barak",
+    username: "noa_barak",
     password: "password123",
     email: "noa_barak@example.com",
-    profilePicture: "https://example.com/noa-barak.jpg",
+    profilePicture:
+      "https://media.istockphoto.com/id/1154642632/photo/close-up-portrait-of-brunette-woman.jpg?s=612x612&w=0&k=20&c=d8W_C2D-2rXlnkyl8EirpHGf-GpM62gBjpDoNryy98U=",
     _id: "noa_barak_1",
   },
   {
-    username: "Ran Mizrahi",
+    username: "ran_mizrahi",
     password: "password123",
     email: "ran_mizrahi@example.com",
-    profilePicture: "https://example.com/ran-mizrahi.jpg",
+    profilePicture:
+      "https://sb.kaleidousercontent.com/67418/1920x1281/0e9f02a048/christian-buehner-ditylc26zvi-unsplash.jpg",
     _id: "ran_mizrahi_1",
   },
   {
-    username: "Tamar Gal",
+    username: "tamar_gal",
     password: "password123",
     email: "tamar_gal@example.com",
-    profilePicture: "https://example.com/tamar-gal.jpg",
+    profilePicture:
+      "https://images.unsplash.com/photo-1619895862022-09114b41f16f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D",
     _id: "tamar_gal_1",
   },
   {
-    username: "Yossi Nachum",
+    username: "yossi_nachum",
     password: "password123",
     email: "yossi_nachum@example.com",
-    profilePicture: "https://example.com/yossi-nachum.jpg",
+    profilePicture:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqeGuXD0uL4dbsb0u5NQV0iNHUEccICRfPvA&s",
     _id: "yossi_nachum_1",
   },
   {
-    username: "Maya Ron",
+    username: "maya_ron",
     password: "password123",
     email: "maya_ron@example.com",
-    profilePicture: "https://example.com/maya-ron.jpg",
+    profilePicture:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwme89cM8YZvHcybGrZl_Obd9U9p5QabozJQ&s",
     _id: "maya_ron_1",
   },
   {
-    username: "Michael Rosen",
+    username: "michael_rosen",
     password: "password123",
     email: "michael_rosen@example.com",
-    profilePicture: "https://example.com/michael-rosen.jpg",
+    profilePicture:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHnTyfZcAeMJaYKWEC8PjLcpw-YJ-i4Znalw&s",
     _id: "michael_rosen_1",
   },
   {
-    username: "Yarden Maman",
+    username: "yarden_maman",
     password: "password123",
     email: "yarden_maman@example.com",
-    profilePicture: "https://example.com/yarden-maman.jpg",
+    profilePicture:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoht9i-54WkkEeEwKbIf3NTUAk_NTr9OOqnQ&s",
     _id: "yarden_maman_1",
   },
 ];
