@@ -5,9 +5,7 @@
     "start": "tsc && node ./dist/src/app.js",
     "test": "jest --detectOpenHandles --forceExit --coverage",
     "testAuth": "jest --detectOpenHandles --forceExit --coverage tests/auth.test.ts",
-    "testPosts": "jest --detectOpenHandles --forceExit --coverage tests/posts.test.ts",
-    "testComments": "jest --detectOpenHandles --forceExit --coverage tests/comments.test.ts",
-    "testUsers": "jest --detectOpenHandles --forceExit --coverage tests/users.test.ts",
+    "testUser": "jest --detectOpenHandles --forceExit --coverage tests/user.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
