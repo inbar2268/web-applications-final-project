@@ -7,19 +7,19 @@ import {
   ImageListItemBar,
 } from "@mui/material";
 import "./App.css";
-import { mockPosts } from "../mocData";
+import { mockPosts, mockUsers } from "../mocData";
 import { useEffect, useState } from "react";
-import { Post } from "../interfaces/post";
+import { IPost } from "../interfaces/post";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 function Home() {
-  const [shuffledItem, setShuffeldItem] = useState<Post[]>(mockPosts);
+  const [shuffledItem, setShuffeldItem] = useState<IPost[]>(mockPosts);
 
   useEffect(() => {
     setShuffeldItem(shuffleArray(shuffledItem));
   }, []);
 
-  function shuffleArray(array: Post[]) {
+  function shuffleArray(array: IPost[]) {
     return [...array].sort(() => Math.random() - 0.5);
   }
   return (
@@ -47,7 +47,10 @@ function Home() {
                   <Box sx={{ display: "flex", alignItems: "flex-end" }}>
                     <Avatar
                       alt="User"
-                      src="/static/images/avatar/2.jpg"
+                      src={
+                        mockUsers.find((user) => user.username === item.owner)
+                          ?.profilePicture
+                      }
                       sx={{ width: 35, height: 35, marginLeft: 2 }}
                     />
                     {item.title}
