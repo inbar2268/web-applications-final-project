@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import authRoute from "./routes/auth_route";
 import userRoute from "./routes/user_route";
+import postRoute from "./routes/posts_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 
@@ -50,7 +51,8 @@ const initApp = () => {
           app.use(bodyParser.urlencoded({ extended: true }));
           app.use("/auth", authRoute);
           app.use("/users", userRoute);
-          app.use("/uploads", express.static('uploads'));
+          app.use("/posts", postRoute);
+          app.use("/uploads", express.static("uploads"));
           resolve(app);
         })
         .catch((error) => {
