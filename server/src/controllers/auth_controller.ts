@@ -3,7 +3,79 @@ import UserModel, { IUser } from '../models/users_model';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Document } from 'mongoose';
+import { OAuth2Client } from 'google-auth-library';
 
+
+const client = new OAuth2Client();
+
+const checkUsernameInDb = async(username: string) => {
+    const user = await UserModel.findOne({ username });
+    return user !== null;
+}
+
+const generateUsernameWithSuffix = async(baseUsername: string) => {
+    if(await checkUsernameInDb(baseUsername)){
+        let suffix = 1;
+        let newUsername = `${baseUsername}${suffix}`;
+        
+        while (await checkUsernameInDb(newUsername)) {
+          suffix += 1;
+          newUsername = `${baseUsername}${suffix}`;
+        }
+        return newUsername;
+    } else{
+        return baseUsername; 
+    }
+  }
+
+
+const googleSignin = async (req: Request, res: Response): Promise<void> => {
+   const credential = req.body.credential;
+   try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const email = payload?.email
+        const image = payload?.picture
+
+        if(email != null){
+            let user = await UserModel.findOne({'email': email});
+            if (user == null) {
+                let username = (payload?.given_name + "_" +  payload?.family_name).toLowerCase();
+                const uniqueUsername = await generateUsernameWithSuffix(username);
+
+                user = await UserModel.create(
+                    {
+                        'email': email,
+                        'profilePicture': image,
+                        'username': uniqueUsername,
+                        'password': ''
+                });
+            }
+            const tokens = generateToken(user._id);
+            if (!tokens) {
+                res.status(500).send('Server Error');
+                return;
+            }
+            if (!user.refreshToken) {
+                user.refreshToken = [];
+            }
+            user.refreshToken.push(tokens.refreshToken);
+            await user.save();
+            res.status(200).send(
+                {
+                    accessToken: tokens.accessToken,
+                    refreshToken: tokens.refreshToken,
+                    _id: user._id
+                });
+        }
+   } catch (err) {
+
+       res.status(400).send(err);
+   }
+}
 
 const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -234,5 +306,6 @@ export default {
     register,
     login,
     refresh,
-    logout
+    logout,
+    googleSignin
 };

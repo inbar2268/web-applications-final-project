@@ -187,4 +187,34 @@ router.put("/:id", authMiddleware, userController.update.bind(userController));
  */
 router.delete("/:id", authMiddleware, userController.deleteItem.bind(userController));
 
+/**
+ * @swagger
+ * /users/username/{username}:
+ *   get:
+ *     summary: Get a user by username
+ *     description: Retrieve a user by their username
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The username of the user
+ *     responses:
+ *       200:
+ *         description: The user object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.get("/username/:username", userController.getByUsername.bind(userController));
+
+
 export default router;
