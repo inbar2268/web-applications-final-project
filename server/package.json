@@ -6,6 +6,7 @@
     "test": "jest --detectOpenHandles --forceExit --coverage",
     "testAuth": "jest --detectOpenHandles --forceExit --coverage tests/auth.test.ts",
     "testUser": "jest --detectOpenHandles --forceExit --coverage tests/user.test.ts",
+    "testComments": "jest --detectOpenHandles --forceExit --coverage tests/comments.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
