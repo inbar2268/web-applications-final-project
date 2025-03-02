@@ -9,6 +9,15 @@ class UserController extends BaseController<IUser> {
     super(userModel);
   }
 
+  async getAll(req: Request, res: Response) {
+    try {
+      const items = await this.model.find();
+      res.send(items);
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  }
+
   async getById(req: Request, res: Response) {
     const { id } = req.params;
 
