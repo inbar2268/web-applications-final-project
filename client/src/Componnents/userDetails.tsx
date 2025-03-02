@@ -8,11 +8,19 @@ import { IPost } from "../interfaces/post";
 import EditIcon from "@mui/icons-material/Edit";
 import UserEditMode from "./userEditMode";
 import UserViewMode from "./UserViewMode";
+import { ImageModal } from "./ImageModal";
 
 function UserDetails() {
   const [user, setUser] = useState<IUser>(mockUsers[3]);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [posts, setPosts] = useState<IPost[]>([]);
+  const [openImage, setOpenImage] = useState<boolean>(false);
+  const [selectedPost, setSelectedPost] = useState<IPost>(mockPosts[0]);
+
+  function handleClickOnImage(post: IPost) {
+    setSelectedPost(post);
+    setOpenImage(true);
+  }
 
   useEffect(() => {
     filterUserPost();
@@ -81,7 +89,10 @@ function UserDetails() {
       >
         <ImageList variant="masonry" cols={3} gap={8}>
           {posts.map((item) => (
-            <ImageListItem key={item.image}>
+            <ImageListItem
+              key={item.image}
+              onClick={() => handleClickOnImage(item)}
+            >
               <img
                 srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
                 src={`${item.image}?w=248&fit=crop&auto=format`}
@@ -91,6 +102,11 @@ function UserDetails() {
             </ImageListItem>
           ))}
         </ImageList>
+        <ImageModal
+          modalState={openImage}
+          seletedPost={selectedPost}
+          setModaleState={setOpenImage}
+        />
       </Box>
     </div>
   );
