@@ -14,6 +14,13 @@ const testUser: User = {
   profilePicture: "https://example.com/profile.jpg",
 };
 
+const secondTestUser: User = {
+  username: "testuser2",
+  email: "testuser2@example.com",
+  password: "testpassword",
+  profilePicture: "https://example.com/profile2.jpg",
+};
+
 beforeAll(async () => {
   console.log("beforeAll - Setting up test environment");
   app = await initApp();
@@ -28,6 +35,7 @@ afterAll((done) => {
 
 describe("User Controller API Tests", () => {
   let userId: string;
+  let secondUserId: string;
 
   test("Get all users (Initially empty)", async () => {
     const response = await request(app).get("/users");
@@ -49,13 +57,43 @@ describe("User Controller API Tests", () => {
     expect(res.body._id).toBeDefined();
     testUser.token = res.body.accessToken;
     testUser._id = res.body._id;
+    userId = res.body._id;
+  });
+
+  test("Create another user", async () => {
+    await request(app).post("/auth/register").send(secondTestUser);
+    const res = await request(app).post("/auth/login").send({
+      email: secondTestUser.email,
+      password: secondTestUser.password,
+      username: secondTestUser.username,
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.accessToken).toBeDefined();
+    expect(res.body._id).toBeDefined();
+    secondTestUser.token = res.body.accessToken;
+    secondTestUser._id = res.body._id;
+    secondUserId = res.body._id;
   });
 
   test("Get user by ID", async () => {
-    const response = await request(app).get(`/users/${testUser._id}`);
+    const response = await request(app).get(`/users/${userId}`);
     expect(response.statusCode).toBe(200);
-    expect(response.body.username).toBe("testuser");
-    expect(response.body.email).toBe("testuser@example.com");
+    expect(response.body.username).toBe(testUser.username);
+    expect(response.body.email).toBe(testUser.email);
+  });
+
+  test("Get user by username", async () => {
+    const response = await request(app).get(`/users/username/${testUser.username}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.username).toBe(testUser.username);
+    expect(response.body.email).toBe(testUser.email);
+  });
+
+  test("Fail to get user by non-existing username", async () => {
+    const response = await request(app).get(`/users/username/nonexistentuser`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body.error).toBe("User not found");
   });
 
   test("Update user details", async () => {
@@ -65,7 +103,7 @@ describe("User Controller API Tests", () => {
     };
 
     const response = await request(app)
-      .put(`/users/${testUser._id}`)
+      .put(`/users/${userId}`)
       .set({ authorization: `JWT ${testUser.token}` }) 
       .send(updatedUser);
 
@@ -74,7 +112,17 @@ describe("User Controller API Tests", () => {
     expect(response.body.profilePicture).toBe("NewImage");
   });
 
-  test("Fail: Get user that does not exist", async () => {
+  test("Fail to update user with an existing username", async () => {
+    const response = await request(app)
+      .put(`/users/${userId}`)
+      .set({ authorization: `JWT ${testUser.token}` }) 
+      .send({ username: secondTestUser.username });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe("Username is already taken");
+  });
+
+  test("Fail to get user that does not exist", async () => {
     const nonExistentId = new mongoose.Types.ObjectId().toString();
     const response = await request(app).get(`/users/${nonExistentId}`);
 
@@ -84,18 +132,18 @@ describe("User Controller API Tests", () => {
 
   test("Delete user", async () => {
     const response = await request(app)
-      .delete(`/users/${testUser._id}`)
+      .delete(`/users/${userId}`)
       .set({ authorization: `JWT ${testUser.token}` });
 
     expect(response.statusCode).toBe(200);
     expect(response.text).toBe("deleted");
 
-    const response2 = await request(app).get(`/users/${testUser._id}`);
+    const response2 = await request(app).get(`/users/${userId}`);
     expect(response2.statusCode).toBe(404);
     expect(response2.body.error).toBe("User not found");
   });
 
-  test("Fail: Delete user that does not exist", async () => {
+  test("Fail to delete user that does not exist", async () => {
     const response = await request(app)
       .delete(`/users/${new mongoose.Types.ObjectId()}`)
       .set({ authorization: `JWT ${testUser.token}` });

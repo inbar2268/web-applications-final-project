@@ -36,6 +36,57 @@ class postsController extends BaseController<IPost> {
       }
     }
   }
+  async likePost(req: Request, res: Response) {
+    const postId = req.params.id;
+    const { username } = req.body; 
+    try {
+      const post = await PostModel.findById(postId);
+      if (!post) {
+        res.status(404).send({ error: "Post not found" });
+        return;
+      }
+
+      if (post.likedBy.includes(username)) {
+        res.status(400).send({ error: "User already liked this post" });
+        return;
+      }
+
+      post.likedBy.push(username);
+      await post.save();
+
+      res.status(200).send(post);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Server error" });
+    }
+  }
+
+  
+  async unlikePost(req: Request, res: Response) {
+    const postId = req.params.id;
+    const { username } = req.body; 
+
+    try {
+      const post = await PostModel.findById(postId);
+      if (!post) {
+        res.status(404).send({ error: "Post not found" });
+        return;
+      }
+
+      if (!post.likedBy.includes(username)) {
+        res.status(400).send({ error: "User has not liked this post" });
+        return;
+      }
+
+      post.likedBy = post.likedBy.filter((user) => user !== username);
+      await post.save();
+
+      res.status(200).send(post);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Server error" });
+    }
+  }
 }
 
 export default new postsController();
