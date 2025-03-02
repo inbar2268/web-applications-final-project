@@ -1,19 +1,30 @@
 import {
   Avatar,
   Box,
+  Button,
   IconButton,
   ImageList,
   ImageListItem,
   ImageListItemBar,
+  Modal,
 } from "@mui/material";
 import "./App.css";
 import { mockPosts, mockUsers } from "../mocData";
 import { useEffect, useState } from "react";
 import { IPost } from "../interfaces/post";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import RecipeReviewCard from "./imageCard";
+import { ImageModal } from "./ImageModal";
 
 function Home() {
   const [shuffledItem, setShuffeldItem] = useState<IPost[]>(mockPosts);
+  const [openImage, setOpenImage] = useState<boolean>(false);
+  const [selectedPost, setSelectedPost] = useState<IPost>(mockPosts[0]);
+
+  function handleClickOnImage(post: IPost) {
+    setSelectedPost(post);
+    setOpenImage(true);
+  }
 
   useEffect(() => {
     setShuffeldItem(shuffleArray(shuffledItem));
@@ -26,7 +37,10 @@ function Home() {
     <div>
       <ImageList variant="masonry" cols={3} gap={8}>
         {shuffledItem.map((item) => (
-          <ImageListItem key={item.image}>
+          <ImageListItem
+            key={item.image}
+            onClick={() => handleClickOnImage(item)}
+          >
             <img
               srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
               src={`${item.image}?w=248&fit=crop&auto=format`}
@@ -73,6 +87,12 @@ function Home() {
           </ImageListItem>
         ))}
       </ImageList>
+
+      <ImageModal
+        modalState={openImage}
+        seletedPost={selectedPost}
+        setModaleState={setOpenImage}
+      />
     </div>
   );
 }
