@@ -235,8 +235,8 @@ export const mockUsers: IUser[] = [
     username: "yarden_maman",
     password: "password123",
     email: "yarden_maman@example.com",
-    profilePicture:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoht9i-54WkkEeEwKbIf3NTUAk_NTr9OOqnQ&s",
+    // profilePicture:
+    //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoht9i-54WkkEeEwKbIf3NTUAk_NTr9OOqnQ&s",
     _id: "yarden_maman_1",
   },
 ];

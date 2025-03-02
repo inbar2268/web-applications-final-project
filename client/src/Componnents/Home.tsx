@@ -46,7 +46,9 @@ function Home() {
                 <div dir="rtl">
                   <Box sx={{ display: "flex", alignItems: "flex-end" }}>
                     <Avatar
-                      alt="User"
+                      alt={mockUsers
+                        .find((user) => user.username === item.owner)
+                        ?.username.toUpperCase()}
                       src={
                         mockUsers.find((user) => user.username === item.owner)
                           ?.profilePicture
