@@ -3,6 +3,7 @@ import {IUser} from "../interfaces/user"
 import { IFormData as ILogin } from '../interfaces/signInForm';
 import { IFormData as IRegister} from '../interfaces/signInForm';
 
+
 export const loginUser = (data: ILogin) => {
     return new Promise<IUser>((resolve, reject) => {
         console.log("login user")
