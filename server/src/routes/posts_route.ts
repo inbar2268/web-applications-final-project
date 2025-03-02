@@ -252,4 +252,81 @@ router.get(
   postsController.getPostsByOwner.bind(postsController)
 );
 
+/**
+ * @swagger
+ * /posts/{id}/like:
+ *   post:
+ *     summary: Like a post
+ *     description: Adds a user to the likedBy list of a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The post ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username of the user liking the post
+ *     responses:
+ *       200:
+ *         description: Post liked successfully
+ *       400:
+ *         description: User already liked this post
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsController));
+
+/**
+ * @swagger
+ * /posts/{id}/like:
+ *   delete:
+ *     summary: Unlike a post
+ *     description: Removes a user from the likedBy list of a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The post ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username of the user unliking the post
+ *     responses:
+ *       200:
+ *         description: Post unliked successfully
+ *       400:
+ *         description: User has not liked this post
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.delete("/:id/like", authMiddleware, postsController.unlikePost.bind(postsController));
+
+
 export default router;

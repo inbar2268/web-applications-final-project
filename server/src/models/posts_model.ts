@@ -5,6 +5,7 @@ export interface IPost {
   constent: string;
   owner: string;
   image?: string;
+  likedBy: string[];
 }
 
 const postSchema = new mongoose.Schema({
@@ -20,6 +21,10 @@ const postSchema = new mongoose.Schema({
   Image: {
     type: String,
     required: false,
+  },
+  likedBy: {
+    type: [String], 
+    default: [], 
   },
 });
 
