@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { useForm } from "react-hook-form";
-import { loginUser } from "../services/authService";
+import { loginUser, googleSignIn } from "../services/authService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Box,
@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { schema, IFormData } from "../interfaces/signInForm";
 import { useNavigate } from "react-router-dom";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 const SignIn: FC = () => {
   const {
@@ -37,6 +38,21 @@ const SignIn: FC = () => {
         setErrorMessage("Incorrect login credentials");
       });
   };
+
+  const onGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
+    console.log(credentialResponse);
+    try{
+        googleSignIn(credentialResponse);
+        navigate("/");
+    } catch(err){
+        console.error("login failed:", err);
+        setErrorMessage("google sign in falied");
+    }
+  }
+
+  const onGoogleLoginFailure = () => {
+    setErrorMessage("google sign in falied");
+  }
 
   return (
     <Container maxWidth="sm">
@@ -142,6 +158,18 @@ const SignIn: FC = () => {
         <Divider sx={{ width: "100%", my: 3 }}>
           <Typography sx={{ px: 2, color: "text.secondary" }}>or</Typography>
         </Divider>
+
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <Box className="google-login-container">
+          <GoogleLogin 
+            onSuccess={onGoogleLoginSuccess} 
+            onError={onGoogleLoginFailure} 
+            shape="pill"
+            size="large"
+            />
+          </Box>
+        </Box>
+
 
         <Box sx={{ textAlign: "center" }}>
           <Typography variant="body1">
