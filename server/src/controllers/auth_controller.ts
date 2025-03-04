@@ -51,7 +51,7 @@ const googleSignin = async (req: Request, res: Response): Promise<void> => {
                         'email': email,
                         'profilePicture': image,
                         'username': uniqueUsername,
-                        'password': ''
+                        'password': '*'
                 });
             }
             const tokens = generateToken(user._id);
@@ -72,7 +72,6 @@ const googleSignin = async (req: Request, res: Response): Promise<void> => {
                 });
         }
    } catch (err) {
-
        res.status(400).send(err);
    }
 }
