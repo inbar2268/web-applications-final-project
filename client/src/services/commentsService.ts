@@ -5,7 +5,6 @@ import { AxiosError } from "axios";
 export const getComments = (postId: string) => {
     return new Promise<IComment>((resolve, reject) => {
         apiClient.get(`/comments/post/${postId}`).then((response)=> {
-            console.log(response)
             resolve(response.data)
         }).catch((error: AxiosError)=>{
             console.log(error)
@@ -18,7 +17,6 @@ export const getComments = (postId: string) => {
 export const createComment = (comment: IComment) => {
     return new Promise<IComment>((resolve, reject) => {
         apiClient.post('/comments/', comment).then((response)=> {
-            console.log(response)
             resolve(response.data)
         }).catch((error: AxiosError)=>{
             console.log(error)
@@ -30,7 +28,6 @@ export const createComment = (comment: IComment) => {
 export const deleteComment = (commentId: string) => {
     return new Promise<IComment>((resolve, reject) => {
         apiClient.delete(`/comments/${commentId}`).then((response)=> {
-            console.log(response)
             resolve(response.data)
         }).catch((error: AxiosError)=>{
             console.log(error)

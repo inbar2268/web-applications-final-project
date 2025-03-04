@@ -45,8 +45,6 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
 
     const fetchComments = async () => {
     try {
-        console.log("open comments")
-
         setLoading(true);
         setError("");
         const response = await getComments(mockpostId);
