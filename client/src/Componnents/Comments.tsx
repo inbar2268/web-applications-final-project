@@ -69,7 +69,7 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
       setComments(comments.filter((comment) => comment._id !== commentId));
     } catch (err) {
       console.error("Error deleteing comment:", err);
-      setError("Failed to delete comment. Please try again.");
+      setError(String(err));
     } finally {
       setLoading(false);
     }
@@ -173,13 +173,16 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
             ) : comments.length > 0 ? (
               comments.map((comment) => (
                 <React.Fragment key={comment._id}>
+                  
                   <ListItem alignItems="flex-start"
                         secondaryAction={
                             comment.owner === mockowner ? (
                               <IconButton edge="end" aria-label="delete" sx={{ fontSize: 18 }} 
                               onClick={(e) => {
                                 e.stopPropagation();
+                                console.log(comment._id)
                                 handleDeleteComment(comment._id || "");
+                                
                               }}>
                                 <DeleteIcon sx={{ fontSize: 18 }} />
                               </IconButton>
