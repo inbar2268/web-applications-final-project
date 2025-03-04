@@ -27,7 +27,7 @@ function Home() {
 
   useEffect(() => {
     setShuffeldItem(shuffleArray(shuffledItem));
-  }, []);
+  }, []);  
 
   function shuffleArray(array: IPost[]) {
     return [...array].sort(() => Math.random() - 0.5);
@@ -35,8 +35,8 @@ function Home() {
   return (
     <div>
       <ImageList variant="masonry" cols={3} gap={8}>
-        {shuffledItem.map((item) => (
-          <ImageListItem
+        {shuffledItem.map((item) => (    
+          <ImageListItem      
             key={item.image}
             onClick={() => handleClickOnImage(item)}
           >

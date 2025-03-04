@@ -25,15 +25,10 @@ interface CommentsProps {
 }
 
 const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
-  // State for managing comments
   const [comments, setComments] = useState<IComment[]>([]);
-  // State for managing the modal
   const [open, setOpen] = useState(false);
-  // State for new comment text
   const [newComment, setNewComment] = useState("");
-  // Loading state
   const [loading, setLoading] = useState(false);
-  // Error state
   const [error, setError] = useState("");
 
   const mockpostId = "67c57bd73ba7e81e7bfa37bc";
@@ -70,8 +65,8 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
     setError("");
     
     try {
-      const response = await deleteComment(commentId);
-      setComments([...comments, response]);
+      await deleteComment(commentId);
+      setComments(comments.filter((comment) => comment._id !== commentId));
     } catch (err) {
       console.error("Error deleteing comment:", err);
       setError("Failed to delete comment. Please try again.");
