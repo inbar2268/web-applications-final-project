@@ -1,12 +1,10 @@
 import {
   Avatar,
   Box,
-  Button,
   IconButton,
   ImageList,
   ImageListItem,
   ImageListItemBar,
-  Modal,
 } from "@mui/material";
 import "./App.css";
 import { mockPosts, mockUsers } from "../mocData";
@@ -15,6 +13,7 @@ import { IPost } from "../interfaces/post";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import RecipeReviewCard from "./imageCard";
 import { ImageModal } from "./ImageModal";
+import CommentPopup from "./Comments";
 
 function Home() {
   const [shuffledItem, setShuffeldItem] = useState<IPost[]>(mockPosts);
@@ -28,7 +27,7 @@ function Home() {
 
   useEffect(() => {
     setShuffeldItem(shuffleArray(shuffledItem));
-  }, []);
+  }, []);  
 
   function shuffleArray(array: IPost[]) {
     return [...array].sort(() => Math.random() - 0.5);
@@ -36,8 +35,8 @@ function Home() {
   return (
     <div>
       <ImageList variant="masonry" cols={3} gap={8}>
-        {shuffledItem.map((item) => (
-          <ImageListItem
+        {shuffledItem.map((item) => (    
+          <ImageListItem      
             key={item.image}
             onClick={() => handleClickOnImage(item)}
           >
@@ -75,17 +74,21 @@ function Home() {
               }
               position="top"
               actionIcon={
-                <IconButton
-                  sx={{ color: "white" }}
-                  aria-label={`star ${item.title}`}
-                >
-                  <FavoriteBorderIcon />
-                </IconButton>
+                <Box sx={{ display: 'flex' }}>
+                  <IconButton
+                    sx={{ color: "white" }}
+                    aria-label={`star ${item.title}`}
+                  >
+                    <FavoriteBorderIcon />
+                  </IconButton>
+                  <CommentPopup postId={item._id} />
+                </Box>
               }
               actionPosition="left"
             />
           </ImageListItem>
         ))}
+        
       </ImageList>
 
       <ImageModal

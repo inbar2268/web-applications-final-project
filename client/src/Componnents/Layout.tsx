@@ -175,11 +175,27 @@ function Layout() {
                         handleLogoutClick();
                       }
                     }}
+                    sx={{
+                      margin: "4px 8px",
+                      borderRadius: "6px",
+                      transition: "all 0.2s ease",
+                      padding: "8px 16px",
+                      "&:hover": {
+                        backgroundColor: setting === "Logout" ? "rgba(211, 47, 47, 0.08)" : "rgba(25, 118, 210, 0.08)",
+                        transform: "translateY(-1px)",
+                      },
+                    }}
                     component={setting === "Sign In" ? "a" : "li"}
                     href={setting === "Sign In" ? "/signin" : undefined}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {setting}
-                  </Typography>
+                    <Typography 
+                      sx={{ 
+                        textAlign: "center", 
+                        fontWeight: 500,
+                        color: setting === "Logout" ? "error.main" : "text.primary",
+                      }}
+                    >
+                      {setting}
+                    </Typography>
                 </MenuItem>
               ))}
               </Menu>
