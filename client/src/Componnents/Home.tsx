@@ -7,18 +7,24 @@ import {
   ImageListItemBar,
 } from "@mui/material";
 import "./App.css";
-import { mockPosts, mockUsers } from "../mocData";
 import { useEffect, useState } from "react";
 import { IPost } from "../interfaces/post";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import RecipeReviewCard from "./imageCard";
 import { ImageModal } from "./ImageModal";
 import CommentPopup from "./Comments";
+import { getposts } from "../services/postsService";
+import { useDispatch, useSelector } from "react-redux";
+import { selectPosts, updatePostsArray } from "../Redux/slices/postsSlice";
+import { getUsers } from "../services/usersService";
+import { selectUsers, updateUsersArray } from "../Redux/slices/usersSlice";
 
 function Home() {
-  const [shuffledItem, setShuffeldItem] = useState<IPost[]>(mockPosts);
+  const posts = useSelector(selectPosts);
+  const users = useSelector(selectUsers);
+  const [shuffledItem, setShuffeldItem] = useState<IPost[]>(posts);
   const [openImage, setOpenImage] = useState<boolean>(false);
-  const [selectedPost, setSelectedPost] = useState<IPost>(mockPosts[0]);
+  const [selectedPost, setSelectedPost] = useState<IPost>(posts[0]);
+  const dispatch = useDispatch();
 
   function handleClickOnImage(post: IPost) {
     setSelectedPost(post);
@@ -27,7 +33,16 @@ function Home() {
 
   useEffect(() => {
     setShuffeldItem(shuffleArray(shuffledItem));
-  }, []);  
+  }, []);
+
+  useEffect(() => {
+    getposts().then((response) => {
+      dispatch(updatePostsArray(response));
+    });
+    getUsers().then((response) => {
+      dispatch(updateUsersArray(response));
+    });
+  }, []);
 
   function shuffleArray(array: IPost[]) {
     return [...array].sort(() => Math.random() - 0.5);
@@ -35,8 +50,8 @@ function Home() {
   return (
     <div>
       <ImageList variant="masonry" cols={3} gap={8}>
-        {shuffledItem.map((item) => (    
-          <ImageListItem      
+        {shuffledItem.map((item) => (
+          <ImageListItem
             key={item.image}
             onClick={() => handleClickOnImage(item)}
           >
@@ -59,11 +74,11 @@ function Home() {
                 <div dir="rtl">
                   <Box sx={{ display: "flex", alignItems: "flex-end" }}>
                     <Avatar
-                      alt={mockUsers
+                      alt={users
                         .find((user) => user.username === item.owner)
                         ?.username.toUpperCase()}
                       src={
-                        mockUsers.find((user) => user.username === item.owner)
+                        users.find((user) => user.username === item.owner)
                           ?.profilePicture
                       }
                       sx={{ width: 35, height: 35, marginLeft: 2 }}
@@ -74,7 +89,7 @@ function Home() {
               }
               position="top"
               actionIcon={
-                <Box sx={{ display: 'flex' }}>
+                <Box sx={{ display: "flex" }}>
                   <IconButton
                     sx={{ color: "white" }}
                     aria-label={`star ${item.title}`}
@@ -88,7 +103,6 @@ function Home() {
             />
           </ImageListItem>
         ))}
-        
       </ImageList>
 
       <ImageModal
