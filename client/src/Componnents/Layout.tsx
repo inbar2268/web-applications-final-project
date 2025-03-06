@@ -11,15 +11,17 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Logo from "../assets/Logo.svg";
 import { logout } from "../services/authService";
 import { logout as logoutRedux } from "../Redux/slices/loggedUserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 
-const pages = [{ name: "User", path: "/user" }];
-const settings = ["Sign In", "Logout"];
+// const pages = [{ name: "User", path: "/user" }];
+const pages: { name: string; path: string }[] = [];
+const settings1 = ["Sign In"];
+const settings2 = ["Profile", "Logout"];
 
 function Layout() {
   const navigate = useNavigate();
@@ -27,6 +29,18 @@ function Layout() {
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const user = useSelector(selectLoggedUser);
   const dispatch = useDispatch();
+  const [settings, setSettings] = useState(settings1);
+
+  function emptyUser(): boolean {
+    if (user.username === "" && user.email === "" && user.password === "")
+      return true;
+    else return false;
+  }
+
+  useEffect(() => {
+    if (emptyUser()) setSettings(settings1);
+    else setSettings(settings2);
+  }, [user]);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -179,6 +193,8 @@ function Layout() {
                       handleCloseUserMenu();
                       if (setting === "Logout") {
                         handleLogoutClick();
+                      } else if (setting === "Profile") {
+                        navigate(`/profile/${user?._id}`, { state: { user } });
                       }
                     }}
                     sx={{

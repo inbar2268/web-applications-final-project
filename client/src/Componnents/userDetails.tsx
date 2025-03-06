@@ -17,10 +17,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectPosts } from "../Redux/slices/postsSlice";
 import { updateUser } from "../Redux/slices/usersSlice";
 import { editUser } from "../services/usersService";
+import { useLocation } from "react-router-dom";
 
 function UserDetails() {
+  const location = useLocation();
   const loggedUser = useSelector(selectLoggedUser);
-  const [user, setUser] = useState<IUser>(loggedUser);
+  const [user, setUser] = useState<IUser>(location.state?.user);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [posts, setPosts] = useState<IPost[]>([]);
   const [openImage, setOpenImage] = useState<boolean>(false);

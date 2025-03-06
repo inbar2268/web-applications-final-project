@@ -37,7 +37,10 @@ const SignIn: FC = () => {
     loginUser(data)
       .then((response) => {
         console.log("login successful:", response);
-        dispatch(login(response));
+        if (response._id)
+          getUserById(response._id).then((response) => {
+            dispatch(login(response));
+          });
         navigate("/");
       })
       .catch((error) => {
