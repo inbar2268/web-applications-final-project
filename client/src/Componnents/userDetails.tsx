@@ -48,9 +48,9 @@ function UserDetails() {
   //TODO: switch to with update user data
   function onCheck(user: IUser) {
     if (user._id) editUser(user._id, user);
-    updateUser(user);
     setUser(user);
     dispatch(updateLoggedUser(user));
+    dispatch(updateUser(user));
     setEditMode(false);
   }
   return (
