@@ -12,6 +12,8 @@ import { IPost } from "../interfaces/post";
 import { Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectUsers } from "../Redux/slices/usersSlice";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 interface IRecipeReviewCardProps extends IconButtonProps {
   post: IPost;
@@ -19,6 +21,14 @@ interface IRecipeReviewCardProps extends IconButtonProps {
 
 export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
   const users = useSelector(selectUsers);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(
+    users.find((user) => user.username === props.post.owner)
+  );
+
+  useEffect(() => {
+    setUser(users.find((user) => user.username === props.post.owner));
+  });
   return (
     <Card sx={{ width: "40rem", maxHeight: "35rem" }}>
       <CardHeader
@@ -29,6 +39,9 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
             src={
               users.find((user) => user.username === props.post.owner)
                 ?.profilePicture
+            }
+            onClick={() =>
+              navigate(`/profile/${user?._id}`, { state: { user } })
             }
           ></Avatar>
         }
