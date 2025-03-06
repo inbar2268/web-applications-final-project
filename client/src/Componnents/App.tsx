@@ -6,9 +6,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./Layout";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
+import { Provider } from "react-redux";
+import { store } from "../Redux/store";
 
 function App() {
   return (
+    <Provider store={store}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -19,6 +22,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
       </Routes>
     </BrowserRouter>
+    </Provider>
   );
 }
 
