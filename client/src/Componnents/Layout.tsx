@@ -14,6 +14,9 @@ import MenuItem from "@mui/material/MenuItem";
 import { useState } from "react";
 import Logo from "../assets/Logo.svg";
 import { logout } from "../services/authService";
+import { logout as logoutRedux } from "../Redux/slices/loggedUserSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 
 const pages = [{ name: "User", path: "/user" }];
 const settings = ["Sign In", "Logout"];
@@ -22,6 +25,8 @@ function Layout() {
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const user = useSelector(selectLoggedUser);
+  const dispatch = useDispatch();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -38,6 +43,7 @@ function Layout() {
 
   const handleLogoutClick = () => {
     logout();
+    dispatch(logoutRedux());
     navigate("/");
   };
 
@@ -153,7 +159,7 @@ function Layout() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="User" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt="User" src={user?.profilePicture} />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -166,9 +172,9 @@ function Layout() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                  {settings.map((setting) => (
-                  <MenuItem 
-                    key={setting} 
+                {settings.map((setting) => (
+                  <MenuItem
+                    key={setting}
                     onClick={() => {
                       handleCloseUserMenu();
                       if (setting === "Logout") {
@@ -181,23 +187,28 @@ function Layout() {
                       transition: "all 0.2s ease",
                       padding: "8px 16px",
                       "&:hover": {
-                        backgroundColor: setting === "Logout" ? "rgba(211, 47, 47, 0.08)" : "rgba(25, 118, 210, 0.08)",
+                        backgroundColor:
+                          setting === "Logout"
+                            ? "rgba(211, 47, 47, 0.08)"
+                            : "rgba(25, 118, 210, 0.08)",
                         transform: "translateY(-1px)",
                       },
                     }}
                     component={setting === "Sign In" ? "a" : "li"}
-                    href={setting === "Sign In" ? "/signin" : undefined}>
-                    <Typography 
-                      sx={{ 
-                        textAlign: "center", 
+                    href={setting === "Sign In" ? "/signin" : undefined}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
                         fontWeight: 500,
-                        color: setting === "Logout" ? "error.main" : "text.primary",
+                        color:
+                          setting === "Logout" ? "error.main" : "text.primary",
                       }}
                     >
                       {setting}
                     </Typography>
-                </MenuItem>
-              ))}
+                  </MenuItem>
+                ))}
               </Menu>
             </Box>
           </Toolbar>

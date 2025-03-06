@@ -1,6 +1,6 @@
 import { Box, IconButton, ImageList, ImageListItem } from "@mui/material";
 import "./App.css";
-import { mockPosts, mockUsers } from "../mocData";
+// import { mockPosts } from "../mocData";
 import { IUser } from "../interfaces/user";
 import { useEffect, useState } from "react";
 import Divider from "@mui/material/Divider";
@@ -9,13 +9,24 @@ import EditIcon from "@mui/icons-material/Edit";
 import UserEditMode from "./userEditMode";
 import UserViewMode from "./UserViewMode";
 import { ImageModal } from "./ImageModal";
+import {
+  selectLoggedUser,
+  updateLoggedUser,
+} from "../Redux/slices/loggedUserSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectPosts } from "../Redux/slices/postsSlice";
+import { updateUser } from "../Redux/slices/usersSlice";
+import { editUser } from "../services/usersService";
 
 function UserDetails() {
-  const [user, setUser] = useState<IUser>(mockUsers[3]);
+  const loggedUser = useSelector(selectLoggedUser);
+  const [user, setUser] = useState<IUser>(loggedUser);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [posts, setPosts] = useState<IPost[]>([]);
   const [openImage, setOpenImage] = useState<boolean>(false);
-  const [selectedPost, setSelectedPost] = useState<IPost>(mockPosts[0]);
+  const allPosts = useSelector(selectPosts);
+  const [selectedPost, setSelectedPost] = useState<IPost>(allPosts[0]);
+  const dispatch = useDispatch();
 
   function handleClickOnImage(post: IPost) {
     setSelectedPost(post);
@@ -28,7 +39,7 @@ function UserDetails() {
 
   //TODO: switch to with get posts by owner
   function filterUserPost() {
-    setPosts(mockPosts.filter((post) => post.owner === user.username));
+    setPosts(allPosts.filter((post) => post.owner === user.username));
   }
 
   function onCancle() {
@@ -36,7 +47,10 @@ function UserDetails() {
   }
   //TODO: switch to with update user data
   function onCheck(user: IUser) {
+    if (user._id) editUser(user._id, user);
+    updateUser(user);
     setUser(user);
+    dispatch(updateLoggedUser(user));
     setEditMode(false);
   }
   return (
@@ -52,21 +66,23 @@ function UserDetails() {
       >
         {!editMode ? (
           <>
-            <IconButton
-              aria-label="edit"
-              onClick={() => setEditMode(!editMode)}
-              sx={{
-                float: "right",
-                color: "#B05219",
-                width: "1.8rem",
-                height: "1.8rem",
-                top: "80%",
-                "&:focus": { outline: "none" },
-                "&:focus-visible": { outline: "none" },
-              }}
-            >
-              <EditIcon />
-            </IconButton>
+            {user._id === loggedUser?._id && (
+              <IconButton
+                aria-label="edit"
+                onClick={() => setEditMode(!editMode)}
+                sx={{
+                  float: "right",
+                  color: "#B05219",
+                  width: "1.8rem",
+                  height: "1.8rem",
+                  top: "80%",
+                  "&:focus": { outline: "none" },
+                  "&:focus-visible": { outline: "none" },
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
             <UserViewMode user={user} />
           </>
         ) : (
