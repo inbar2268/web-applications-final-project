@@ -9,14 +9,16 @@ import Typography from "@mui/material/Typography";
 import { red } from "@mui/material/colors";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { IPost } from "../interfaces/post";
-import { mockUsers } from "../mocData";
 import { Button } from "@mui/material";
+import { useSelector } from "react-redux";
+import { selectUsers } from "../Redux/slices/usersSlice";
 
 interface IRecipeReviewCardProps extends IconButtonProps {
   post: IPost;
 }
 
 export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
+  const users = useSelector(selectUsers);
   return (
     <Card sx={{ width: "40rem", maxHeight: "35rem" }}>
       <CardHeader
@@ -25,7 +27,7 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
             sx={{ bgcolor: red[500] }}
             aria-label="recipe"
             src={
-              mockUsers.find((user) => user.username === props.post.owner)
+              users.find((user) => user.username === props.post.owner)
                 ?.profilePicture
             }
           ></Avatar>
@@ -70,7 +72,6 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
           <FavoriteIcon />
         </IconButton>
 
-        
         {/* TODO: SHOW ONLY FOR CONNEXTED USER POSTS */}
         <Button
           aria-label="edit"
