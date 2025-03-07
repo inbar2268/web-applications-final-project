@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export interface IComments {
   comment: string;
-  owner: string;
+  userId: string;
   postId: string;
 }
 const commentsSchema = new mongoose.Schema<IComments>({
@@ -10,7 +10,7 @@ const commentsSchema = new mongoose.Schema<IComments>({
     type: String,
     required: true,
   },
-  owner: {
+  userId: {
     type: String,
     required: true,
   },

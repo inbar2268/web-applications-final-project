@@ -30,18 +30,54 @@ export const postsSlice = createSlice({
       state.posts = posts;
     },
     updatePost: (state, action: PayloadAction<IPost>) => {
-      let users = state.posts;
+      let posts = state.posts;
       const index = state.posts.findIndex(
         (post) => post._id === action.payload._id
       );
-      users.splice(index, 1, action.payload);
-      state.posts = users;
+      posts.splice(index, 1, action.payload);
+      state.posts = posts;
+    },
+    like: (
+      state,
+      action: PayloadAction<{ postId: string; userId: string }>
+    ) => {
+      let posts = state.posts;
+      const index = state.posts.findIndex(
+        (post) => post._id === action.payload.postId
+      );
+      posts.splice(index, 1, {
+        ...posts[index],
+        likedBy: [...posts[index].likedBy, action.payload.userId],
+      });
+      state.posts = posts;
+    },
+    unlike: (
+      state,
+      action: PayloadAction<{ postId: string; userId: string }>
+    ) => {
+      const { postId, userId } = action.payload;
+      const postIndex = state.posts.findIndex((post) => post._id === postId);
+      if (postIndex === -1) return;
+
+      const updatedPost = {
+        ...state.posts[postIndex],
+        likedBy: state.posts[postIndex].likedBy.filter(
+          (user) => user !== userId
+        ),
+      };
+      state.posts[postIndex] = updatedPost;
     },
   },
 });
 
-export const { updatePost, updatePostsArray, deletePost, addPost } =
-  postsSlice.actions;
+export const {
+  like,
+  unlike,
+  updatePost,
+  updatePostsArray,
+  deletePost,
+  addPost,
+} = postsSlice.actions;
 
 export const postsReducer = postsSlice.reducer;
 

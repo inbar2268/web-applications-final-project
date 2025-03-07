@@ -62,19 +62,6 @@ export const getPostById = (_id: string) => {
       });
   });
 };
-export const getPostByUserName = (username: string) => {
-  return new Promise<IPost[]>((resolve, reject) => {
-    apiClient
-      .get(`/posts/byOwner/${username}`)
-      .then((response) => {
-        resolve(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        reject("Failed to fetch posts. Please try again.");
-      });
-  });
-};
 
 export const editPost = (_id: string, updatedData: Partial<IUser>) => {
   return new Promise<IPost>((resolve, reject) => {
@@ -90,10 +77,10 @@ export const editPost = (_id: string, updatedData: Partial<IUser>) => {
   });
 };
 
-export const likePost = (postId: string, username: string) => {
+export const likePost = (postId: string, userId: string) => {
   return new Promise<{ post: IPost; likedBy: string[] }>((resolve, reject) => {
     apiClient
-      .post(`/posts/${postId}/like`, { username })
+      .post(`/posts/${postId}/like`, { userId })
       .then((response) => {
         resolve(response.data);
       })
@@ -103,10 +90,10 @@ export const likePost = (postId: string, username: string) => {
       });
   });
 };
-export const unlikePost = (postId: string, username: string) => {
+export const unlikePost = (postId: string, userId: string) => {
   return new Promise<{ post: IPost; likedBy: string[] }>((resolve, reject) => {
     apiClient
-      .delete(`/posts/${postId}/like`, { data: { username } })
+      .post(`/posts/${postId}/unlike`, { userId })
       .then((response) => {
         resolve(response.data);
       })

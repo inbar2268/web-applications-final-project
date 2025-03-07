@@ -1,17 +1,17 @@
 [
     {
         "comment": "This is a comment",
-        "owner": "Valeriya",
-        "postId": "safgsefdgsdfgsd"
+        "userId": "replace_with_test_user_id",
+        "postId": "728570e81c764287aead75e9"
     },
     {
         "comment": "This is another comment",
-        "owner": "Valeriya",
-        "postId": "safgsefdgsdfgsd"
+        "userId": "replace_with_test_user_id",
+        "postId": "728570e81c764287aead75e9"
     },
     {
         "comment": "This is another comment",
-        "owner": "Valeriya",
-        "postId": "safgsefdgsdfgsd"
+        "userId": "replace_with_test_user_id",
+        "postId": "728570e81c764287aead75e9"
     }
 ]

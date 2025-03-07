@@ -39,15 +39,15 @@ function UserDetails() {
     filterUserPost();
   }, []);
 
-  //TODO: switch to with get posts by owner
+
   function filterUserPost() {
-    setPosts(allPosts.filter((post) => post.owner === user.username));
+    setPosts(allPosts.filter((post) => post.userId === user._id));
   }
 
   function onCancle() {
     setEditMode(false);
   }
-  //TODO: switch to with update user data
+  
   function onCheck(user: IUser) {
     if (user._id) editUser(user._id, user);
     setUser(user);

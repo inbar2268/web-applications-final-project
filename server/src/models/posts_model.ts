@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export interface IPost {
   title: string;
   constent: string;
-  owner: string;
+  userId: string;
   image?: string;
   likedBy: string[];
 }
@@ -14,7 +14,7 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   content: String,
-  owner: {
+  userId: {
     type: String,
     required: true,
   },

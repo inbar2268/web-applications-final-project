@@ -4,16 +4,16 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Avatar from "@mui/material/Avatar";
-import IconButton, { IconButtonProps } from "@mui/material/IconButton";
+import { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { red } from "@mui/material/colors";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import { IPost } from "../interfaces/post";
 import { Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectUsers } from "../Redux/slices/usersSlice";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { LikeIcon } from "./like";
 
 interface IRecipeReviewCardProps extends IconButtonProps {
   post: IPost;
@@ -23,11 +23,11 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
   const users = useSelector(selectUsers);
   const navigate = useNavigate();
   const [user, setUser] = useState(
-    users.find((user) => user.username === props.post.owner)
+    users.find((user) => user._id === props.post.userId)
   );
 
   useEffect(() => {
-    setUser(users.find((user) => user.username === props.post.owner));
+    setUser(users.find((user) => user._id === props.post.userId));
   });
   return (
     <Card sx={{ width: "40rem", maxHeight: "35rem" }}>
@@ -37,7 +37,7 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
             sx={{ bgcolor: red[500] }}
             aria-label="recipe"
             src={
-              users.find((user) => user.username === props.post.owner)
+              users.find((user) => user._id === props.post.userId)
                 ?.profilePicture
             }
             onClick={() =>
@@ -81,9 +81,7 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
+        <LikeIcon post={props.post} />
 
         {/* TODO: SHOW ONLY FOR CONNEXTED USER POSTS */}
         <Button
