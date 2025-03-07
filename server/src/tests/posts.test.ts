@@ -38,13 +38,13 @@ afterAll((done) => {
 let postId = "";
 
 describe("Posts Tests", () => {
-  test("✅ Get all posts (Initially empty)", async () => {
+  test("Get all posts (Initially empty)", async () => {
     const response = await request(app).get("/posts");
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(0);
   });
 
-  test("✅ Create a post", async () => {
+  test("Create a post", async () => {
     const response = await request(app)
       .post("/posts")
       .set({ authorization: "JWT " + testUser.token })

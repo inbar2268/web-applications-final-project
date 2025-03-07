@@ -9,6 +9,15 @@ class postsController extends BaseController<IPost> {
     super(PostModel);
   }
 
+  async getAll(req: Request, res: Response) {
+    try {
+      const posts = await this.model.find();
+      res.status(200).send(posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      res.status(500).send({ error: "Server error" });
+    }
+  }
   
   async create(req: Request, res: Response) {
     const userId = req.body.userId;
