@@ -23,11 +23,11 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
   const users = useSelector(selectUsers);
   const navigate = useNavigate();
   const [user, setUser] = useState(
-    users.find((user) => user.username === props.post.owner)
+    users.find((user) => user._id === props.post.userId)
   );
 
   useEffect(() => {
-    setUser(users.find((user) => user.username === props.post.owner));
+    setUser(users.find((user) => user._id === props.post.userId));
   });
   return (
     <Card sx={{ width: "40rem", maxHeight: "35rem" }}>
@@ -37,7 +37,7 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
             sx={{ bgcolor: red[500] }}
             aria-label="recipe"
             src={
-              users.find((user) => user.username === props.post.owner)
+              users.find((user) => user._id === props.post.userId)
                 ?.profilePicture
             }
             onClick={() =>
