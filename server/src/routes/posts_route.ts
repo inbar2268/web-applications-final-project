@@ -19,6 +19,7 @@ import { authMiddleware } from "../controllers/auth_controller";
  *       required:
  *         - title
  *         - content
+ *         - userId
  *       properties:
  *         _id:
  *           type: string
@@ -29,14 +30,24 @@ import { authMiddleware } from "../controllers/auth_controller";
  *         content:
  *           type: string
  *           description: The content of the post
- *         owner:
+ *         userId:
  *           type: string
- *           description: The owner username of the post
+ *           description: The ID of the user who created the post
+ *         image:
+ *           type: string
+ *           description: URL of the post image (optional)
+ *         likedBy:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of user IDs who liked the post
  *       example:
- *         _id: 245234t234234r234r23f4
- *         title: My First Post
- *         content: This is the content of my first post.
- *         author: hadar
+ *         _id: "245234t234234r234r23f4"
+ *         title: "My First Post"
+ *         content: "This is the content of my first post."
+ *         userId: "60d0fe4f5311236168a109ca"
+ *         image: "https://example.com/image.jpg"
+ *         likedBy: ["60d0fe4f5311236168a109cb"]
  */
 
 /**
@@ -58,24 +69,17 @@ import { authMiddleware } from "../controllers/auth_controller";
  *             properties:
  *               title:
  *                 type: string
- *                 description: The title of the post
  *               content:
  *                 type: string
- *                 description: The content of the post
- *               owner:
+ *               userId:
  *                 type: string
- *                 description: The username of the owner of the post
  *             required:
  *               - title
  *               - content
- *               - owner
+ *               - userId
  *     responses:
  *       201:
  *         description: Post created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Post'
  *       400:
  *         description: Invalid input
  *       500:
@@ -94,12 +98,6 @@ router.post("/", authMiddleware, postsController.create.bind(postsController));
  *     responses:
  *       200:
  *         description: A list of posts
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Post'
  *       500:
  *         description: Server error
  */
@@ -110,23 +108,17 @@ router.get("/", postsController.getAll.bind(postsController));
  * /posts/{id}:
  *   get:
  *     summary: Get a post by ID
- *     description: Retrieve a single post by its ID
  *     tags:
  *       - Posts
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The ID of the post
  *     responses:
  *       200:
  *         description: A single post
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Post'
  *       404:
  *         description: Post not found
  *       500:
@@ -138,8 +130,7 @@ router.get("/:id", postsController.getById.bind(postsController));
  * @swagger
  * /posts/{id}:
  *   put:
- *     summary: update a post
- *     description: Retrieve a single post by its ID
+ *     summary: Update a post
  *     tags:
  *       - Posts
  *     security:
@@ -147,10 +138,9 @@ router.get("/:id", postsController.getById.bind(postsController));
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The ID of the post
  *     requestBody:
  *       required: true
  *       content:
@@ -160,41 +150,29 @@ router.get("/:id", postsController.getById.bind(postsController));
  *             properties:
  *               title:
  *                 type: string
- *                 description: The title of the post
  *               content:
  *                 type: string
- *                 description: The content of the post
- *               owner:
+ *               userId:
  *                 type: string
- *                 description: The username of the owner of the post
  *             required:
  *               - title
  *               - content
- *               - owner
+ *               - userId
  *     responses:
  *       200:
- *         description: A single post
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Post'
+ *         description: Post updated successfully
  *       404:
  *         description: Post not found
  *       500:
  *         description: Server error
  */
-router.put(
-  "/:id",
-  authMiddleware,
-  postsController.update.bind(postsController)
-);
+router.put("/:id", authMiddleware, postsController.update.bind(postsController));
 
 /**
  * @swagger
  * /posts/{id}:
  *   delete:
  *     summary: Delete a post by ID
- *     description: Delete a single post by its ID
  *     tags:
  *       - Posts
  *     security:
@@ -202,10 +180,9 @@ router.put(
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The ID of the post
  *     responses:
  *       200:
  *         description: Post deleted successfully
@@ -214,60 +191,45 @@ router.put(
  *       500:
  *         description: Server error
  */
-router.delete(
-  "/:id",
-  authMiddleware,
-  postsController.deleteItem.bind(postsController)
-);
+router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsController));
 
 /**
  * @swagger
- * /posts/byOwner/{owner}:
+ * /posts/byUser/{userId}:
  *   get:
- *     summary: Get all post by owner name
- *     description: Retrieve a list of comment  by its Post ID
+ *     summary: Get all posts by a user's ID
  *     tags:
  *       - Posts
  *     parameters:
  *       - in: path
- *         name: owner username
+ *         name: userId
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The owner of the post
  *     responses:
  *       200:
- *         description: A list of posts
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/posts/schemas/Comment'
+ *         description: A list of posts by the user
+ *       404:
+ *         description: No posts found
  *       500:
  *         description: Server error
  */
-router.get(
-  "/byOwner/:owner",
-  postsController.getPostsByOwner.bind(postsController)
-);
+router.get("/byUser/:userId", postsController.getPostsByUserId.bind(postsController));
 
 /**
  * @swagger
  * /posts/{id}/like:
  *   post:
  *     summary: Like a post
- *     description: Adds a user to the likedBy list of a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The post ID
  *     requestBody:
  *       required: true
  *       content:
@@ -275,9 +237,8 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               userId:
  *                 type: string
- *                 description: The username of the user liking the post
  *     responses:
  *       200:
  *         description: Post liked successfully
@@ -285,8 +246,6 @@ router.get(
  *         description: User already liked this post
  *       404:
  *         description: Post not found
- *       500:
- *         description: Server error
  */
 router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsController));
 
@@ -295,17 +254,15 @@ router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsCont
  * /posts/{id}/like:
  *   delete:
  *     summary: Unlike a post
- *     description: Removes a user from the likedBy list of a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The post ID
  *     requestBody:
  *       required: true
  *       content:
@@ -313,9 +270,8 @@ router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsCont
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               userId:
  *                 type: string
- *                 description: The username of the user unliking the post
  *     responses:
  *       200:
  *         description: Post unliked successfully
@@ -323,10 +279,7 @@ router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsCont
  *         description: User has not liked this post
  *       404:
  *         description: Post not found
- *       500:
- *         description: Server error
  */
 router.delete("/:id/like", authMiddleware, postsController.unlikePost.bind(postsController));
-
 
 export default router;

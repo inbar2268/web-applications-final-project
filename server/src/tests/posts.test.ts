@@ -2,8 +2,8 @@ import request from "supertest";
 import initApp from "../server";
 import mongoose from "mongoose";
 import postModel from "../models/posts_model";
-import { Express } from "express";
 import userModel, { IUser } from "../models/users_model";
+import { Express } from "express";
 
 var app: Express;
 
@@ -25,6 +25,7 @@ beforeAll(async () => {
   expect(response.statusCode).toBe(200);
   const accessToken = response.body.accessToken;
   testUser.token = accessToken;
+  testUser._id = response.body._id;
   expect(accessToken).toBeDefined();
 });
 
@@ -37,20 +38,20 @@ afterAll((done) => {
 let postId = "";
 
 describe("Posts Tests", () => {
-  test("Get all posts (Initially empty)", async () => {
+  test("✅ Get all posts (Initially empty)", async () => {
     const response = await request(app).get("/posts");
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(0);
   });
 
-  test("Create a post", async () => {
+  test("✅ Create a post", async () => {
     const response = await request(app)
       .post("/posts")
       .set({ authorization: "JWT " + testUser.token })
       .send({
         title: "Test Post",
         content: "Test Content",
-        owner: "testuser",
+        userId: testUser._id,
       });
     expect(response.statusCode).toBe(201);
     expect(response.body.title).toBe("Test Post");
@@ -58,14 +59,14 @@ describe("Posts Tests", () => {
     postId = response.body._id;
   });
 
-  test("Fail to create post with non-existent owner", async () => {
+  test("Fail to create post with non-existent userId", async () => {
     const response = await request(app)
       .post("/posts")
       .set({ authorization: "JWT " + testUser.token })
       .send({
         title: "Test Post",
-        content: testUser.username,
-        owner: "nonexistentuser",
+        content: "Test Content",
+        userId: "nonexistentUserId",
       });
     expect(response.statusCode).not.toBe(201);
   });
@@ -77,8 +78,8 @@ describe("Posts Tests", () => {
     expect(response.body.content).toBe("Test Content");
   });
 
-  test("Get posts by owner", async () => {
-    const response = await request(app).get(`/posts/byOwner/${testUser.username}`);
+  test("Get posts by userId", async () => {
+    const response = await request(app).get(`/posts/byUser/${testUser._id}`);
     expect(response.statusCode).toBe(200);
   });
 
@@ -89,7 +90,7 @@ describe("Posts Tests", () => {
       .send({
         title: "Updated Post",
         content: "Updated Content",
-        owner: "testuser",
+        userId: testUser._id,
       });
     expect(response.statusCode).toBe(200);
     expect(response.body.title).toBe("Updated Post");
@@ -101,10 +102,10 @@ describe("Posts Tests", () => {
     const response = await request(app)
       .post(`/posts/${postId}/like`)
       .set({ authorization: "JWT " + testUser.token })
-      .send({ username: testUser.username });
+      .send({ userId: testUser._id });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.likedBy).toContain(testUser.username);
+    expect(response.body.likedBy).toContain(testUser._id);
   });
 
   
@@ -112,21 +113,21 @@ describe("Posts Tests", () => {
     const response = await request(app)
       .post(`/posts/${postId}/like`)
       .set({ authorization: "JWT " + testUser.token })
-      .send({ username: testUser.username });
+      .send({ userId: testUser._id });
 
-    expect(response.statusCode).toBe(400); // Already liked
+    expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe("User already liked this post");
   });
 
- 
-  test(" Unlike a post", async () => {
+  
+  test("Unlike a post", async () => {
     const response = await request(app)
       .delete(`/posts/${postId}/like`)
       .set({ authorization: "JWT " + testUser.token })
-      .send({ username: testUser.username });
+      .send({ userId: testUser._id });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.likedBy).not.toContain(testUser.username);
+    expect(response.body.likedBy).not.toContain(testUser._id);
   });
 
   
@@ -134,12 +135,13 @@ describe("Posts Tests", () => {
     const response = await request(app)
       .delete(`/posts/${postId}/like`)
       .set({ authorization: "JWT " + testUser.token })
-      .send({ username: testUser.username });
+      .send({ userId: testUser._id });
 
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe("User has not liked this post");
   });
 
+  
   test("Delete post", async () => {
     const response = await request(app)
       .delete(`/posts/${postId}`)
