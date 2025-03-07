@@ -19,7 +19,7 @@ const router = express.Router();
  *       type: object
  *       required:
  *         - comment
- *         - owner
+ *         - userId
  *         - postId
  *       properties:
  *         _id:
@@ -28,7 +28,7 @@ const router = express.Router();
  *         comment:
  *           type: string
  *           description: The content of the comment
- *         owner:
+ *         userId:
  *           type: string
  *           description: The user ID who created the comment
  *         postId:
@@ -37,7 +37,7 @@ const router = express.Router();
  *       example:
  *         _id: "65d0fe4f5311236168a109ca"
  *         comment: "This is a great post!"
- *         owner: "65a0fe4f5311236168a109cb"
+ *         userId: "65a0fe4f5311236168a109cb"
  *         postId: "65d0fe4f5311236168a109cc"
  */
 
@@ -46,23 +46,17 @@ const router = express.Router();
  * /comments:
  *   get:
  *     summary: Get all comments
- *     description: Retrieve a list of all comments. Optionally, filter by owner.
+ *     description: Retrieve a list of all comments. Optionally, filter by userId.
  *     tags: [Comments]
  *     parameters:
  *       - in: query
- *         name: owner
+ *         name: userId
  *         schema:
  *           type: string
- *         description: Filter comments by owner ID
+ *         description: Filter comments by user ID
  *     responses:
  *       200:
  *         description: A list of comments
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Comment'
  *       400:
  *         description: Invalid request
  */
@@ -85,10 +79,6 @@ router.get("/", commentsController.getAll.bind(commentsController));
  *     responses:
  *       200:
  *         description: A single comment object
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Comment'
  *       404:
  *         description: Comment not found
  *       400:
@@ -113,12 +103,6 @@ router.get("/:id", commentsController.getById.bind(commentsController));
  *     responses:
  *       200:
  *         description: List of comments for the specified post
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Comment'
  *       400:
  *         description: Invalid or missing post ID
  *       404:
@@ -142,14 +126,24 @@ router.get("/post/:postId", commentsController.getByPostId.bind(commentsControll
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Comment'
+ *             type: object
+ *             properties:
+ *               comment:
+ *                 type: string
+ *                 description: The content of the comment
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user who is posting the comment
+ *               postId:
+ *                 type: string
+ *                 description: The ID of the post to which the comment belongs
+ *             required:
+ *               - comment
+ *               - userId
+ *               - postId
  *     responses:
  *       201:
  *         description: Comment created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Comment'
  *       400:
  *         description: Invalid input
  *       401:

@@ -4,13 +4,13 @@ import mongoose from "mongoose";
 import commentsModel from "../models/comment_model";
 import userModel, { IUser } from "../models/users_model";
 import { Express } from "express";
-import testComments from "./test_comments.json";
+import fs from "fs";
 
 var app: Express;
 let accessToken = ""; 
 let testUserId = ""; 
 let commentId = ""; 
-const testPostId = "safgsefdgsdfgsd"; 
+const testPostId = "728570e81c764287aead75e9"; 
 
 const testUser: IUser = {
   username: "testuser",
@@ -18,6 +18,8 @@ const testUser: IUser = {
   password: "testpassword",
   profilePicture: "https://example.com/profile.jpg",
 };
+
+const testComments = JSON.parse(fs.readFileSync("./src/tests/test_comments.json", "utf-8"));
 
 beforeAll(async () => {
   console.log("beforeAll - Setting up test environment");
@@ -38,6 +40,8 @@ beforeAll(async () => {
 
   accessToken = loginRes.body.accessToken; 
   testUserId = loginRes.body._id; 
+
+  testComments.forEach((comment: any) => comment.userId = testUserId);
 });
 
 afterAll(async () => {
@@ -54,16 +58,15 @@ describe("Comments Tests", () => {
 
   test("Create multiple comments (Authenticated)", async () => {
     for (let comment of testComments) {
-      const commentData = { ...comment, owner: testUserId };
       const response = await request(app)
         .post("/comments")
         .set({ authorization: `JWT ${accessToken}` }) 
-        .send(commentData);
+        .send(comment);
 
       expect(response.statusCode).toBe(201);
       expect(response.body.comment).toBe(comment.comment);
       expect(response.body.postId).toBe(comment.postId);
-      expect(response.body.owner).toBe(testUserId);
+      expect(response.body.userId).toBe(testUserId);
       commentId = response.body._id; 
     }
   });
@@ -73,18 +76,17 @@ describe("Comments Tests", () => {
     
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(3); 
-
     response.body.forEach((comment: any) => {
       expect(comment.postId).toBe(testPostId);
     });
   });
 
-  test("Get comments by owner", async () => {
-    const response = await request(app).get(`/comments?owner=${testUserId}`);
+  test("Get comments by user ID", async () => {
+    const response = await request(app).get(`/comments?userId=${testUserId}`);
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(3);
     response.body.forEach((comment: any) => {
-      expect(comment.owner).toBe(testUserId);
+      expect(comment.userId).toBe(testUserId);
     });
   });
 
@@ -92,7 +94,7 @@ describe("Comments Tests", () => {
     const response = await request(app).get(`/comments/${commentId}`);
     expect(response.statusCode).toBe(200);
     expect(response.body.postId).toBe(testPostId);
-    expect(response.body.owner).toBe(testUserId);
+    expect(response.body.userId).toBe(testUserId);
   });
 
   test("Delete comment (Authenticated)", async () => {
@@ -104,5 +106,26 @@ describe("Comments Tests", () => {
 
     const response2 = await request(app).get(`/comments/${commentId}`);
     expect(response2.statusCode).toBe(404);
+  });
+
+  test("Fail to create comment without authentication", async () => {
+    const response = await request(app)
+      .post("/comments")
+      .send({
+        comment: "Unauthorized comment",
+        userId: testUserId,
+        postId: testPostId
+      });
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("Fail to delete comment with invalid ID", async () => {
+    const invalidId = "invalidcommentid123";
+    const response = await request(app)
+      .delete(`/comments/${invalidId}`)
+      .set({ authorization: `JWT ${accessToken}` }) 
+
+    expect(response.statusCode).toBe(400);
   });
 });

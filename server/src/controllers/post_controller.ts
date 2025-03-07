@@ -2,43 +2,65 @@ import PostModel, { IPost } from "../models/posts_model";
 import { Request, Response } from "express";
 import BaseController from "./base_conroller";
 import userModel from "../models/users_model";
+import mongoose from "mongoose";
 
 class postsController extends BaseController<IPost> {
   constructor() {
     super(PostModel);
   }
 
+  async getAll(req: Request, res: Response) {
+    try {
+      const posts = await this.model.find();
+      res.status(200).send(posts);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      res.status(500).send({ error: "Server error" });
+    }
+  }
+  
   async create(req: Request, res: Response) {
-    const userId = req.body.owner;
-    const user = await userModel.findOne({ username: userId });
+    const userId = req.body.userId;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      res.status(400).send({ error: "Invalid user ID format" });
+      return;
+    }
+
+    const user = await userModel.findById(userId);
     if (user) {
       super.create(req, res);
     } else {
-      res.status(404).send("User not found");
+      res.status(404).send({ error: "User not found" });
     }
   }
 
-  async getPostsByOwner(req: Request, res: Response) {
-    const owner = req.params.owner;
+ 
+  async getPostsByUserId(req: Request, res: Response) {
+    const userId = req.params.userId;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      res.status(400).send({ error: "Invalid user ID format" });
+      return;
+    }
 
     try {
-      const posts = await PostModel.find({ owner: owner });
+      const posts = await PostModel.find({ userId: userId });
       if (posts.length > 0) {
         res.status(200).send(posts);
       } else {
-        res.status(404).send("Post not found");
+        res.status(404).send({ error: "No posts found for this user" });
       }
-    } catch (error: unknown) {
-      if (error && typeof error === "object" && "message" in error) {
-        res.status(400).send((error as { message: string }).message);
-      } else {
-        res.status(400).send("An unknown error occurred");
-      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Server error" });
     }
   }
+
+ 
   async likePost(req: Request, res: Response) {
     const postId = req.params.id;
-    const { username } = req.body; 
+    const { userId } = req.body;
     try {
       const post = await PostModel.findById(postId);
       if (!post) {
@@ -46,12 +68,12 @@ class postsController extends BaseController<IPost> {
         return;
       }
 
-      if (post.likedBy.includes(username)) {
+      if (post.likedBy.includes(userId)) {
         res.status(400).send({ error: "User already liked this post" });
         return;
       }
 
-      post.likedBy.push(username);
+      post.likedBy.push(userId);
       await post.save();
 
       res.status(200).send(post);
@@ -61,10 +83,10 @@ class postsController extends BaseController<IPost> {
     }
   }
 
-  
+ 
   async unlikePost(req: Request, res: Response) {
     const postId = req.params.id;
-    const { username } = req.body; 
+    const { userId } = req.body;
 
     try {
       const post = await PostModel.findById(postId);
@@ -73,12 +95,12 @@ class postsController extends BaseController<IPost> {
         return;
       }
 
-      if (!post.likedBy.includes(username)) {
+      if (!post.likedBy.includes(userId)) {
         res.status(400).send({ error: "User has not liked this post" });
         return;
       }
 
-      post.likedBy = post.likedBy.filter((user) => user !== username);
+      post.likedBy = post.likedBy.filter((id) => id !== userId);
       await post.save();
 
       res.status(200).send(post);
