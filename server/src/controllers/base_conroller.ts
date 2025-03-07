@@ -8,10 +8,10 @@ class BaseController<T> {
   }
 
   async getAll(req: Request, res: Response) {
-    const filter = req.query.owner;
+    const filter = req.query.userId;
     try {
       if (filter) {
-        const item = await this.model.find({ owner: filter });
+        const item = await this.model.find({ userId: filter });
         res.send(item);
       } else {
         const items = await this.model.find();
