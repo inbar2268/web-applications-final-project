@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import crypto from "crypto"; // ✅ Import for generating GUIDs
+import crypto from "crypto";
 
 const router = express.Router();
 
