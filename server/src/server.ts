@@ -6,6 +6,7 @@ import authRoute from "./routes/auth_route";
 import userRoute from "./routes/user_route";
 import postRoute from "./routes/posts_route";
 import commentsRoute from "./routes/comments_route";
+import fileRoute from "./routes/file_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 
@@ -13,7 +14,7 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Web Application - ex2",
+      title: "Web Application",
       version: "1.0.0",
       description: "REST server including authentication using JWT",
     },
@@ -54,6 +55,8 @@ const initApp = () => {
           app.use("/users", userRoute);
           app.use("/posts", postRoute);
           app.use("/comments", commentsRoute);
+          app.use("/file", fileRoute);  
+          app.use("/public", express.static("public"));
           app.use("/uploads", express.static("uploads"));
           resolve(app);
         })
