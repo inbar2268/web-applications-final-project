@@ -8,6 +8,7 @@
     "testUser": "jest --detectOpenHandles --forceExit --coverage tests/user.test.ts",
     "testComments": "jest --detectOpenHandles --forceExit --coverage tests/comments.test.ts",
     "testPosts": "jest --detectOpenHandles --forceExit --coverage tests/posts.test.ts",
+    "testFiles": "jest --detectOpenHandles --forceExit --coverage tests/file.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
