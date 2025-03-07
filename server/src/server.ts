@@ -7,6 +7,7 @@ import userRoute from "./routes/user_route";
 import postRoute from "./routes/posts_route";
 import commentsRoute from "./routes/comments_route";
 import fileRoute from "./routes/file_route";
+import recipeRoute from "./routes/recipe_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 
@@ -56,6 +57,7 @@ const initApp = () => {
           app.use("/posts", postRoute);
           app.use("/comments", commentsRoute);
           app.use("/file", fileRoute);  
+          app.use("/recipes", recipeRoute);
           app.use("/public", express.static("public"));
           app.use("/uploads", express.static("uploads"));
           resolve(app);
