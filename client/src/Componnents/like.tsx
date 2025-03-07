@@ -10,14 +10,17 @@ import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 
 interface LikeProps {
   post: IPost;
+  color?:string
 }
-export const LikeIcon: React.FC<LikeProps> = ({ post }) => {
+export const LikeIcon: React.FC<LikeProps> = ({ post ,color}) => {
   const user = useSelector(selectLoggedUser);
-  const [userLikedPost, setUserLikedPost] = useState(false);
+  const [userLikedPost, setUserLikedPost] = useState(
+    post.likedBy.includes(user._id)
+  );
 
   useEffect(() => {
-    if (user._id) setUserLikedPost(post.likedBy.includes(user._id));
-  }, [user]);
+    setUserLikedPost(post.likedBy.includes(user._id));
+  }, [user, post]);
   const dispatch = useDispatch();
 
   function handlelike(e: React.MouseEvent) {
@@ -37,7 +40,11 @@ export const LikeIcon: React.FC<LikeProps> = ({ post }) => {
     <>
       {userLikedPost ? (
         <IconButton
-          sx={{ color: "red" }}
+          sx={{
+            color: "red",
+            "&:focus": { outline: "none" },
+            "&:focus-visible": { outline: "none" },
+          }}
           aria-label={`star ${post.title}`}
           onClick={handleUnlike}
           onMouseDown={(e) => e.stopPropagation()}
@@ -49,7 +56,11 @@ export const LikeIcon: React.FC<LikeProps> = ({ post }) => {
         </IconButton>
       ) : (
         <IconButton
-          sx={{ color: "white" }}
+          sx={{
+            color: {color},
+            "&:focus": { outline: "none" },
+            "&:focus-visible": { outline: "none" },
+          }}
           aria-label={`star ${post.title}`}
           onClick={handlelike}
           onMouseDown={(e) => e.stopPropagation()}

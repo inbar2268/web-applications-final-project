@@ -20,7 +20,7 @@ import { LikeIcon } from "./like";
 function Home() {
   const posts = useSelector(selectPosts);
   const users = useSelector(selectUsers);
-  const [shuffledItem, setShuffeldItem] = useState<IPost[]>(posts);
+  const [reverseItems, setReverseItems] = useState<IPost[]>(posts);
   const [openImage, setOpenImage] = useState<boolean>(false);
   const [selectedPost, setSelectedPost] = useState<IPost>(posts[0]);
   const dispatch = useDispatch();
@@ -31,7 +31,7 @@ function Home() {
   }
 
   useEffect(() => {
-    setShuffeldItem(shuffleArray(posts));
+    setReverseItems([...posts].reverse());
   }, [posts]);
 
   useEffect(() => {
@@ -44,13 +44,10 @@ function Home() {
     });
   }, []);
 
-  function shuffleArray(array: IPost[]) {
-    return [...array].sort(() => Math.random() - 0.5);
-  }
   return (
     <div>
       <ImageList variant="masonry" cols={3} gap={8}>
-        {shuffledItem.map((item) => {
+        {reverseItems.map((item) => {
           const user = users.find((user) => user._id === item.userId);
 
           return (
@@ -88,7 +85,7 @@ function Home() {
                 position="top"
                 actionIcon={
                   <Box sx={{ display: "flex" }}>
-                    <LikeIcon post={item} />
+                    <LikeIcon post={item} color="white" />
                     <CommentPopup postId={item._id} />
                   </Box>
                 }
