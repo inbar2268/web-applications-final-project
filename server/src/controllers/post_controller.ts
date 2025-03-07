@@ -86,27 +86,27 @@ class postsController extends BaseController<IPost> {
  
   async unlikePost(req: Request, res: Response) {
     const postId = req.params.id;
-    const { userId } = req.body;
+    const { userId } = req.body; 
 
     try {
-      const post = await PostModel.findById(postId);
-      if (!post) {
-        res.status(404).send({ error: "Post not found" });
-        return;
-      }
+        const post = await PostModel.findById(postId);
+        if (!post) {
+            res.status(404).send({ error: "Post not found" });
+            return;
+        }
 
-      if (!post.likedBy.includes(userId)) {
-        res.status(400).send({ error: "User has not liked this post" });
-        return;
-      }
+        if (!post.likedBy.includes(userId)) {
+            res.status(400).send({ error: "User has not liked this post" });
+            return;
+        }
 
-      post.likedBy = post.likedBy.filter((id) => id !== userId);
-      await post.save();
+        post.likedBy = post.likedBy.filter((id) => id !== userId);
+        await post.save();
 
-      res.status(200).send(post);
+        res.status(200).send(post);
     } catch (error) {
-      console.error(error);
-      res.status(500).send({ error: "Server error" });
+        console.error(error);
+        res.status(500).send({ error: "Server error" });
     }
   }
 }

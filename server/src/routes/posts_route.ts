@@ -251,9 +251,10 @@ router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsCont
 
 /**
  * @swagger
- * /posts/{id}/like:
- *   delete:
+ * /posts/{id}/unlike:
+ *   post:
  *     summary: Unlike a post
+ *     description: Removes a user from the likedBy list of a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -263,6 +264,7 @@ router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsCont
  *         required: true
  *         schema:
  *           type: string
+ *         description: The post ID
  *     requestBody:
  *       required: true
  *       content:
@@ -272,14 +274,33 @@ router.post("/:id/like", authMiddleware, postsController.likePost.bind(postsCont
  *             properties:
  *               userId:
  *                 type: string
+ *                 description: The ID of the user unliking the post
  *     responses:
  *       200:
  *         description: Post unliked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: The post ID
+ *                 title:
+ *                   type: string
+ *                   description: The title of the post
+ *                 likedBy:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of users who liked the post
  *       400:
  *         description: User has not liked this post
  *       404:
  *         description: Post not found
+ *       500:
+ *         description: Server error
  */
-router.delete("/:id/like", authMiddleware, postsController.unlikePost.bind(postsController));
+router.post("/:id/unlike", authMiddleware, postsController.unlikePost.bind(postsController));
 
 export default router;

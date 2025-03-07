@@ -122,26 +122,24 @@ describe("Posts Tests", () => {
   
   test("Unlike a post", async () => {
     const response = await request(app)
-      .delete(`/posts/${postId}/like`)
+      .post(`/posts/${postId}/unlike`)
       .set({ authorization: "JWT " + testUser.token })
       .send({ userId: testUser._id });
-
+  
     expect(response.statusCode).toBe(200);
     expect(response.body.likedBy).not.toContain(testUser._id);
   });
-
   
   test("Fail to unlike a post that was not liked", async () => {
     const response = await request(app)
-      .delete(`/posts/${postId}/like`)
+      .post(`/posts/${postId}/unlike`)
       .set({ authorization: "JWT " + testUser.token })
       .send({ userId: testUser._id });
-
+  
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe("User has not liked this post");
   });
-
-  
+    
   test("Delete post", async () => {
     const response = await request(app)
       .delete(`/posts/${postId}`)
