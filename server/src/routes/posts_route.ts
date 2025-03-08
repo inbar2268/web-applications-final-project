@@ -73,6 +73,8 @@ import { authMiddleware } from "../controllers/auth_controller";
  *                 type: string
  *               userId:
  *                 type: string
+ *               image:
+ *                 type: string
  *             required:
  *               - title
  *               - content
