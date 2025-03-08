@@ -12,7 +12,8 @@ import {
   DialogTitle,
   Button,
   Snackbar,
-  Alert
+  Alert,
+  Typography
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import "./App.css";
@@ -115,6 +116,7 @@ function Home() {
         {reverseItems.map((item) => {
           const user = users.find((user) => user._id === item.userId);
           const isUsersPost = isUserLoggedIn() && currentUser._id === item.userId;
+          const commentCount = item.commentsCount || 0;
 
           return (
             <ImageListItem
@@ -166,7 +168,21 @@ function Home() {
                       </IconButton>
                     )}
                     <LikeIcon post={item} color="white" />
-                    <CommentPopup postId={item._id} />
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <CommentPopup post={item} />
+                      <Typography 
+                        variant="body2" 
+                        component="span" 
+                        sx={{ 
+                          color: 'white', 
+                          fontSize: '0.8rem', 
+                          marginRight: '4px',
+                          fontWeight: 'medium'
+                        }}
+                      >
+                        {commentCount}
+                      </Typography>
+                    </Box>
                   </Box>
                 }
                 actionPosition="left"

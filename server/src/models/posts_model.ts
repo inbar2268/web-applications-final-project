@@ -26,6 +26,10 @@ const postSchema = new mongoose.Schema({
     type: [String], 
     default: [], 
   },
+  commentsCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const postModel = mongoose.model("Posts", postSchema);

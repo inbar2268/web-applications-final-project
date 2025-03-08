@@ -18,60 +18,73 @@ import SendIcon from "@mui/icons-material/Send";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { createComment, getComments, deleteComment } from '../services/commentsService';
 import { IComment } from '../interfaces/comment';
-
+import { useDispatch, useSelector } from "react-redux";
+import { selectUsers } from "../Redux/slices/usersSlice";
+import { IPost } from '../interfaces/post';
+import {
+  selectLoggedUser,
+} from "../Redux/slices/loggedUserSlice";
+import { updatePost } from '../Redux/slices/postsSlice';
+import { AxiosError } from 'axios';
 
 interface CommentsProps {
-  postId: string;
+  post: IPost;
 }
 
-const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
+const CommentPopup: React.FC<CommentsProps> = ({ post }) => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [open, setOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const loggedUser = useSelector(selectLoggedUser);
+  const users = useSelector(selectUsers);
 
-  const mockpostId = "67c57bd73ba7e81e7bfa37bc";
-  const mockowner = "hadar123"
-
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (open) {
-
-        fetchComments();
+      fetchComments();
     }
-  }, [open, postId]);
+  }, [open, post._id]);
 
-    const fetchComments = async () => {
+  const fetchComments = async () => {
     try {
-        setLoading(true);
-        setError("");
-        const response = await getComments(mockpostId);
-        setComments(Array.isArray(response) ? response : []);
+      setLoading(true);
+      setError("");
+      const response = await getComments(post._id);
+      setComments(Array.isArray(response) ? response : []);
     } catch (err) {
+
+      if ((err as AxiosError).response?.status == 404) {
+        setComments([]);
+      }
+      else {
         console.error("Error fetching comments:", err);
         setError("Failed to load comments. Please try again.");
+        setComments([]);
+
+      }
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   }
 
   const handleDeleteComment = async (commentId: string) => {
-    
     setLoading(true);
     setError("");
     
     try {
       await deleteComment(commentId);
       setComments(comments.filter((comment) => comment._id !== commentId));
+      dispatch(updatePost({ ...post, commentsCount: post.commentsCount - 1 }));
     } catch (err) {
-      console.error("Error deleteing comment:", err);
+      console.error("Error deleting comment:", err);
       setError(String(err));
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleAddComment = async () => {
     if (newComment.trim() === "") return;
@@ -81,18 +94,21 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
     
     const commentData: IComment = {
       comment: newComment,
-      owner: mockowner,
-      postId: mockpostId
+      userId: loggedUser?._id || "", 
+      postId: post._id,
     };
+
     
     try {
       const response = await createComment(commentData);
       setComments([...comments, response]);
-      setNewComment("");
+      dispatch(updatePost({ ...post, commentsCount: post.commentsCount + 1 }));
+
     } catch (err) {
       console.error("Error adding comment:", err);
-      setError("Failed to add comment. Please try again.");
+      setError(String(err));
     } finally {
+      setNewComment("");
       setLoading(false);
     }
   };
@@ -105,6 +121,11 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
   const handleClose = () => {
     setOpen(false);
     setError("");
+  };
+
+  const getUsernameById = (userId: string): string => {
+    const userFound = users.find(user => user._id === userId);
+    return userFound ? userFound.username : "Unknown User";
   };
 
   const modalStyle = {
@@ -128,7 +149,6 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
         sx={{ color: "white" }}
         aria-label="comments"
         onClick={handleOpen}
-        // Prevent event propagation in multiple ways
         onMouseDown={(e) => e.stopPropagation()}
         onMouseUp={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
@@ -155,7 +175,6 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
           
           <Divider />
           
-          {/* Show error message if there is one */}
           {error && (
             <Typography color="error" sx={{ my: 2 }}>
               {error}
@@ -170,24 +189,30 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
             ) : comments.length > 0 ? (
               comments.map((comment) => (
                 <React.Fragment key={comment._id}>
-                  
-                  <ListItem alignItems="flex-start"
-                        secondaryAction={
-                            comment.owner === mockowner ? (
-                              <IconButton edge="end" aria-label="delete" sx={{ fontSize: 18 }} 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                console.log(comment._id)
-                                handleDeleteComment(comment._id || "");
-                                
-                              }}>
-                                <DeleteIcon sx={{ fontSize: 18 }} />
-                              </IconButton>
-                            ) : null
-                          }
+                  <ListItem 
+                    alignItems="flex-start"
+                    secondaryAction={
+                      comment.userId === loggedUser?._id ? ( 
+                        <IconButton 
+                          edge="end" 
+                          aria-label="delete" 
+                          sx={{ fontSize: 18 }} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteComment(comment._id || "");
+                          }}
+                        >
+                          <DeleteIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      ) : null
+                    }
                   >
                     <ListItemText
-                      primary={<Typography variant="subtitle2">{comment.owner}</Typography>}
+                      primary={
+                        <Typography variant="subtitle2">
+                          {getUsernameById(comment.userId)}
+                        </Typography>
+                      }
                       secondary={
                         <>
                           <Typography
@@ -195,20 +220,18 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
                             variant="body2"
                             color="text.primary"
                             sx={{
-                                wordWrap: 'break-word',  
-                                whiteSpace: 'normal', 
-                              }}
+                              wordWrap: 'break-word',  
+                              whiteSpace: 'normal', 
+                            }}
                           >
                             {comment.comment}
                           </Typography>
-                          
                         </>
                       }
                     />
                   </ListItem>
                   <Divider variant="fullWidth" component="li" />
                 </React.Fragment>
-                
               ))
             ) : (
               <Typography sx={{ textAlign: 'center', my: 2, color: 'text.secondary' }}>

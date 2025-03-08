@@ -5,4 +5,5 @@ export interface IPost {
   image: string;
   likedBy: string[];
   _id: string;
+  commentsCount: number;
 }
