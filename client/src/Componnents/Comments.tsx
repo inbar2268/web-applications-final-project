@@ -35,7 +35,6 @@ const CommentPopup: React.FC<CommentsProps> = ({ postId }) => {
   const mockowner = "hadar123"
 
 
-
   useEffect(() => {
     if (open) {
 
