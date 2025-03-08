@@ -25,6 +25,7 @@ import {
   selectLoggedUser,
 } from "../Redux/slices/loggedUserSlice";
 import { updatePost } from '../Redux/slices/postsSlice';
+import { AxiosError } from 'axios';
 
 interface CommentsProps {
   post: IPost;
@@ -54,12 +55,16 @@ const CommentPopup: React.FC<CommentsProps> = ({ post }) => {
       const response = await getComments(post._id);
       setComments(Array.isArray(response) ? response : []);
     } catch (err) {
-        if (err.response.status === 404) {
-          setComments([]);
-        } else {
-          console.error("Error fetching comments:", err);
-          setError("Failed to load comments. Please try again.");
-        }
+
+      if ((err as AxiosError).response?.status == 404) {
+        setComments([]);
+      }
+      else {
+        console.error("Error fetching comments:", err);
+        setError("Failed to load comments. Please try again.");
+        setComments([]);
+
+      }
     } finally {
       setLoading(false);
     }

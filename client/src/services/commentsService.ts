@@ -7,7 +7,6 @@ export const getComments = (postId: string) => {
         apiClient.get(`/comments/post/${postId}`).then((response)=> {
             resolve(response.data)
         }).catch((error: AxiosError)=>{
-            console.log(error)
             reject(error)
         })
     })
