@@ -18,7 +18,7 @@ import { logout as logoutRedux } from "../Redux/slices/loggedUserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 import { AddPostPage } from "./AddPost";
-import { Fab } from "@mui/material";
+import { Fab, Snackbar, Alert } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 
@@ -35,6 +35,11 @@ function Layout() {
   const dispatch = useDispatch();
   const [settings, setSettings] = useState(settings1);
   const [openAddPostModal, setOpenAddPostModal] = useState(false);
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error"
+  });
 
   function emptyUser(): boolean {
     if (user.username === "" && user.email === "" && user.password === "")
@@ -68,11 +73,20 @@ function Layout() {
     navigate("/");
   };
   const handleAddPostClick = () => {
-    setOpenAddPostModal(true); // Open the Add Post Modal
+    setOpenAddPostModal(true); 
   };
 
-  const handleCloseAddPostModal = () => {
-    setOpenAddPostModal(false); // Close the Add Post Modal
+  const handleCloseNotification = () => {
+    setNotification({...notification, open: false});
+  };
+
+  const handlePostSubmissionResult = (success: boolean) => {
+    setOpenAddPostModal(false); 
+    setNotification({
+      open: true,
+      message: success ? "Post created successfully!" : "Failed to create post. Please try again.",
+      severity: success ? "success" : "error"
+    });
   };
 
   return (
@@ -272,9 +286,33 @@ function Layout() {
       )}
       {openAddPostModal && (
         <AddPostPage
-          handleClose={handleCloseAddPostModal}
+          handleClose={() => setOpenAddPostModal(false)}
+          onSubmitResult={handlePostSubmissionResult}
         />
       )}
+
+      {/* Notification Snackbar */}
+      <Snackbar 
+        open={notification.open} 
+        autoHideDuration={6000} 
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseNotification} 
+          severity={notification.severity}
+          sx={{ 
+            width: '100%',
+            backgroundColor: notification.severity === 'success' ? '#EDF7ED' : '#FDEDED',
+            color: notification.severity === 'success' ? '#1E4620' : '#5F2120',
+            '& .MuiAlert-icon': {
+              color: notification.severity === 'success' ? '#4CAF50' : '#EF5350'
+            }
+          }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

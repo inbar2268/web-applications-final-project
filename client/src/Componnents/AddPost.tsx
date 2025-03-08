@@ -15,7 +15,8 @@ import { useDispatch } from "react-redux";
 
 
 interface AddPostPageProps {
-  handleClose: () => void,
+  handleClose: () => void;
+  onSubmitResult?: (success: boolean) => void;
 }
 
 export function AddPostPage(props: AddPostPageProps) {
@@ -25,6 +26,7 @@ export function AddPostPage(props: AddPostPageProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const loggedUser = useSelector(selectLoggedUser);
   const dispatch = useDispatch();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 
   const handleEditClick = () => {
@@ -42,25 +44,41 @@ export function AddPostPage(props: AddPostPageProps) {
 
   const handleSubmit = async () => {
     console.log('loggedUser', loggedUser);
+    
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    
     if (fileInputRef.current?.files?.[0]) {
       try {
         const imageUrl = await uploadImg(fileInputRef.current?.files?.[0]);
         if (!imageUrl) {
           console.error('Image upload failed');
+          props.onSubmitResult?.(false);
+          setIsSubmitting(false);
           return;
         }
-        const data = { title, userId: loggedUser?._id , content, image: imageUrl};
+        
+        const data = { title, userId: loggedUser?._id, content, image: imageUrl };
         const response = await createPost(data);          
         console.log('response', response);
 
-        if (!response) {
+        if (response) {
           dispatch(addPost(response));          
           console.log('Post added successfully', response);
+          props.onSubmitResult?.(true);
+        } else {
+          props.onSubmitResult?.(false);
         }
-        props.handleClose();
+        
+        setIsSubmitting(false);
       } catch (error) {
         console.error('Create post failed:', error);
+        props.onSubmitResult?.(false);
+        setIsSubmitting(false);
       }
+    } else {
+      props.onSubmitResult?.(false);
+      setIsSubmitting(false);
     }
   };
   
@@ -260,7 +278,7 @@ export function AddPostPage(props: AddPostPageProps) {
               variant="contained"
               endIcon={<SendIcon />}
               onClick={handleSubmit}
-              disabled={!title.trim() || !content.trim() || !imagePreview}
+              disabled={!title.trim() || !content.trim() || !imagePreview || isSubmitting}
               sx={{
                 backgroundColor: "#E8B08E",
                 "&:hover": {
@@ -272,7 +290,7 @@ export function AddPostPage(props: AddPostPageProps) {
                 }
               }}
             >
-              Post
+              {isSubmitting ? "Posting..." : "Post"}
             </Button>
           </CardActions>
         </Card>
