@@ -20,6 +20,7 @@ import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 import { AddPostPage } from "./AddPost";
 import { Fab, Snackbar, Alert } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 
 // const pages = [{ name: "User", path: "/user" }];
 const pages: { name: string; path: string }[] = [];
@@ -71,6 +72,11 @@ function Layout() {
     dispatch(logoutRedux());
     navigate("/");
   };
+
+  const handleGenerateRecipe = () => {
+    navigate('/generate-recipe');
+  };
+
   const handleAddPostClick = () => {
     setOpenAddPostModal(true); 
   };
@@ -120,7 +126,6 @@ function Layout() {
             >
               sharEat
             </Typography>
-
             <Box
               sx={{
                 flexGrow: 1,
@@ -196,7 +201,22 @@ function Layout() {
                 </Button>
               ))}
             </Box>
-
+            {(
+              <Tooltip title="Generate Recipe">
+                <IconButton
+                  onClick={handleGenerateRecipe}
+                  sx={{
+                    mr: 2,
+                    color: "white",
+                    "&:hover": {
+                      color: "#B05219",
+                    },
+                  }}
+                >
+                  <RestaurantMenuIcon />
+                </IconButton>
+              </Tooltip>
+            )}
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
