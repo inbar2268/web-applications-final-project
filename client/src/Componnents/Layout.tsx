@@ -21,7 +21,6 @@ import { AddPostPage } from "./AddPost";
 import { Fab, Snackbar, Alert } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-
 // const pages = [{ name: "User", path: "/user" }];
 const pages: { name: string; path: string }[] = [];
 const settings1 = ["Sign In"];
@@ -79,7 +78,6 @@ function Layout() {
   const handleCloseNotification = () => {
     setNotification({...notification, open: false});
   };
-
   const handlePostSubmissionResult = (success: boolean) => {
     setOpenAddPostModal(false); 
     setNotification({
@@ -261,28 +259,28 @@ function Layout() {
       <Box sx={{ mt: 8 }}>
         <Outlet />
       </Box>
-      {isHomeRoute && (
-      <Fab 
-        color="primary" 
-        aria-label="add post"
-        onClick={handleAddPostClick}
-        sx={{
-          position: 'fixed',
-          bottom: 20,
-          left: 20,
-          backgroundColor: '#E8B08E',
-          '&:hover': {
-            backgroundColor: '#B05219',
-          },
-          '&:active': {
-            backgroundColor: '#B05219',
-            transform: 'none', 
-          },
-          boxShadow: '0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)',
-        }}
-      >
-        <AddIcon />
-      </Fab>
+      {isHomeRoute && !emptyUser() && (
+        <Fab 
+          color="primary" 
+          aria-label="add post"
+          onClick={handleAddPostClick}
+          sx={{
+            position: 'fixed',
+            bottom: 20,
+            left: 20,
+            backgroundColor: '#E8B08E',
+            '&:hover': {
+              backgroundColor: '#B05219',
+            },
+            '&:active': {
+              backgroundColor: '#B05219',
+              transform: 'none', 
+            },
+            boxShadow: '0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)',
+          }}
+        >
+          <AddIcon />
+        </Fab>
       )}
       {openAddPostModal && (
         <AddPostPage
@@ -291,7 +289,6 @@ function Layout() {
         />
       )}
 
-      {/* Notification Snackbar */}
       <Snackbar 
         open={notification.open} 
         autoHideDuration={6000} 
