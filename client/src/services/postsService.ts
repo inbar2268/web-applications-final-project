@@ -3,6 +3,13 @@ import { AxiosError } from "axios";
 import { IUser } from "../interfaces/user";
 import { IPost } from "../interfaces/post";
 
+export interface IPostForm {
+  title: string;
+  content: string;
+  userId: string;
+  image: string;
+}
+
 export const getposts = () => {
   return new Promise<IPost[]>((resolve, reject) => {
     apiClient
@@ -35,7 +42,7 @@ export const deletePost = (_id: string) => {
   });
 };
 
-export const createComment = (post: IPost) => {
+export const createPost = (post: IPostForm) => {
   return new Promise<IPost>((resolve, reject) => {
     apiClient
       .post("/posts/", post)
