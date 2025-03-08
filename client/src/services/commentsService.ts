@@ -13,14 +13,16 @@ export const getComments = (postId: string) => {
     })
 }
 
-
 export const createComment = (comment: IComment) => {
     return new Promise<IComment>((resolve, reject) => {
         apiClient.post('/comments/', comment).then((response)=> {
             resolve(response.data)
         }).catch((error: AxiosError)=>{
-            console.log(error)
-            reject(error)
+            if(error.response?.status === 401) {
+                reject("You are not authorized to create a comment")
+            } else{
+                reject("Failed to create comment. Please try again.") 
+            }
         })
     })
 }
@@ -30,7 +32,6 @@ export const deleteComment = (commentId: string) => {
         apiClient.delete(`/comments/${commentId}`).then((response)=> {
             resolve(response.data)
         }).catch((error: AxiosError)=>{
-            console.log(error)
             if(error.response?.status === 401) {
                 reject("You are not authorized to delete this comment")
             } else{

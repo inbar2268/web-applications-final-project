@@ -1,6 +1,6 @@
 export interface IComment {
     _id?: string;
     comment: string;
-    owner: string;
+    userId: string;
     postId: string;
   }
