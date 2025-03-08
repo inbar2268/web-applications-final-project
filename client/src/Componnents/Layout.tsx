@@ -78,7 +78,6 @@ function Layout() {
   const handleCloseNotification = () => {
     setNotification({...notification, open: false});
   };
-
   const handlePostSubmissionResult = (success: boolean) => {
     setOpenAddPostModal(false); 
     setNotification({
@@ -289,6 +288,7 @@ function Layout() {
           onSubmitResult={handlePostSubmissionResult}
         />
       )}
+
       <Snackbar 
         open={notification.open} 
         autoHideDuration={6000} 
