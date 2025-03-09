@@ -1,5 +1,5 @@
 import request from "supertest";
-import initApp from "../server";
+import { initApp } from "../server";
 import mongoose from "mongoose";
 import { Express } from "express";
 import fs from "fs";
@@ -10,7 +10,7 @@ var app: Express;
 
 beforeAll(async () => {
   console.log("beforeAll - Setting up test environment");
-  app = await initApp();
+  ({ app } = await initApp());
 });
 
 afterAll(async () => {

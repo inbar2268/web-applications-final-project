@@ -1,5 +1,5 @@
 import request from "supertest";
-import initApp from "../server";
+import { initApp } from "../server";
 import mongoose from "mongoose";
 import postModel from "../models/posts_model";
 import userModel, { IUser } from "../models/users_model";
@@ -17,7 +17,8 @@ const testUser: User = {
 
 beforeAll(async () => {
   console.log("beforeAll");
-  app = await initApp();
+  const { app: initializedApp } = await initApp();
+  app = initializedApp;
   await postModel.deleteMany();
   await userModel.deleteMany();
   await request(app).post("/auth/register").send(testUser);
