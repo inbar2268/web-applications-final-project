@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 export interface IMessage {
   senderId: string;   
   receiverId: string; 
+  chatId: string;    
   message: string;    
   timestamp: Date;   
 }
@@ -13,6 +14,10 @@ const messageSchema = new mongoose.Schema<IMessage>({
     required: true,
   },
   receiverId: {
+    type: String,
+    required: true,
+  },
+  chatId: {
     type: String,
     required: true,
   },

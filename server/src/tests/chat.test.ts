@@ -1,9 +1,10 @@
 import request from "supertest";
-import initApp from "../server";
+import { initApp } from "../server";
 import mongoose from "mongoose";
 import chatModel from "../models/chat_model";
 import userModel, { IUser } from "../models/users_model";
 import { Express } from "express";
+import messageModel from "../models/message_model";
 
 var app: Express;
 let accessToken: string = "";
@@ -27,9 +28,10 @@ const testUser2: IUser = {
 
 beforeAll(async () => {
   console.log("beforeAll - Setting up test environment");
-  app = await initApp();
+  ({ app } = await initApp());
   await chatModel.deleteMany();
   await userModel.deleteMany();
+  await messageModel.deleteMany();  
 
   await request(app).post("/auth/register").send(testUser1);
   const loginRes1 = await request(app).post("/auth/login").send({
@@ -105,7 +107,7 @@ describe("Chat Controller Tests", () => {
     expect(response.body.error).toBe("Invalid participant IDs");
   });
 
-  test("✅ Get all chats of the authenticated user", async () => {
+  test("Get all chats of the authenticated user", async () => {
     const response = await request(app)
       .get(`/chats/${testUserId}`)
       .set("Authorization", "JWT " + accessToken);
@@ -121,4 +123,76 @@ test("Fail to get chats without authentication", async () => {
     const response = await request(app).get(`/chats/${nonAuthenticatedUserId}`);
     expect(response.statusCode).toBe(401);
     });
+
+    test("Send a message in a chat", async () => {
+      const messageData = {
+        chatId,
+        senderId: testUserId,
+        receiverId: testUser2Id,
+        message: "Hello, this is a test message!",
+      };
+    
+      const response = await request(app)
+        .post(`/chats/${chatId}/messages`)
+        .set("Authorization", "JWT " + accessToken)
+        .send(messageData);
+    
+      expect(response.statusCode).toBe(201);
+      expect(response.body._id).toBeDefined();
+      expect(response.body.senderId).toBe(testUserId);
+      expect(response.body.receiverId).toBe(testUser2Id);
+      expect(response.body.chatId).toBe(chatId);
+      expect(response.body.message).toBe(messageData.message);
+      expect(response.body.timestamp).toBeDefined();
+    });
+    
+    test("Fail to send message without authentication", async () => {
+      const messageData = {
+        chatId,
+        senderId: testUserId,
+        receiverId: testUser2Id,
+        message: "This message should fail",
+      };
+    
+      const response = await request(app)
+        .post(`/chats/${chatId}/messages`)
+        .send(messageData);
+    
+      expect(response.statusCode).toBe(401);
+    });
+    
+    test("Fail to send message with missing fields", async () => {
+      const invalidMessageData = {
+        chatId,
+        senderId: testUserId,
+        message: "This message should fail",
+      };
+    
+      const response = await request(app)
+        .post(`/chats/${chatId}/messages`)
+        .set("Authorization", "JWT " + accessToken)
+        .send(invalidMessageData);
+    
+      expect(response.statusCode).toBe(400);
+      expect(response.body.error).toBe("Chat ID, Sender ID, Receiver ID, and message are required");
+    });
+    
+    test("Fail to send message in non-existent chat", async () => {
+      const nonExistentChatId = new mongoose.Types.ObjectId().toString();
+      const messageData = {
+        chatId: nonExistentChatId,
+        senderId: testUserId,
+        receiverId: testUser2Id,
+        message: "This should fail because chat doesn't exist",
+      };
+    
+      const response = await request(app)
+        .post(`/chats/${nonExistentChatId}/messages`)
+        .set("Authorization", "JWT " + accessToken)
+        .send(messageData);
+    
+      expect(response.statusCode).toBe(404);
+      expect(response.body.error).toBe("Chat not found");
+    });
+    
 });

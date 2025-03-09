@@ -1,5 +1,5 @@
 import request from "supertest";
-import initApp from "../server";
+import { initApp } from "../server";
 import mongoose from "mongoose";
 import userModel, { IUser } from "../models/users_model";
 import { Express } from "express";
@@ -23,7 +23,8 @@ const secondTestUser: User = {
 
 beforeAll(async () => {
   console.log("beforeAll - Setting up test environment");
-  app = await initApp();
+  const { app: initializedApp } = await initApp();
+  app = initializedApp;
   await userModel.deleteMany();
 });
 
