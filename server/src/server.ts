@@ -9,6 +9,7 @@ import userRoute from "./routes/user_route";
 import postRoute from "./routes/posts_route";
 import commentsRoute from "./routes/comments_route";
 import fileRoute from "./routes/file_route";
+import recipeRoute from "./routes/recipe_route";
 import chatRoute from "./routes/chat_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
@@ -61,6 +62,7 @@ app.use("/posts", postRoute);
 app.use("/comments", commentsRoute);
 app.use("/file", fileRoute);
 app.use("/chats", chatRoute);
+app.use("/recipes", recipeRoute);
 app.use("/public", express.static("public"));
 app.use("/uploads", express.static("uploads"));
 
@@ -83,7 +85,7 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 const initApp = () => {
   return new Promise<{ app: Express; server: Server }>((resolve, reject) => {
     if (!process.env.DB_CONNECT) {
-      reject("❌ DB_CONNECT is not defined in .env file");
+      reject("DB_CONNECT is not defined in .env file");
     } else {
       mongoose
         .connect(process.env.DB_CONNECT as string)
