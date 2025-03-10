@@ -1,8 +1,14 @@
-import initApp from "./server";
+import { initApp } from "./server";
 
-const port = process.env.PORT;
-initApp().then((app) => {
-  app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+
+initApp()
+  .then(({ app, server }) => {
+    server.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
+      console.log(`WebSocket server running on ws://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to initialize application:", error);
   });
-});

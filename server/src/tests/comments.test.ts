@@ -1,5 +1,5 @@
 import request from "supertest";
-import initApp from "../server";
+import { initApp } from "../server";
 import mongoose from "mongoose";
 import commentsModel from "../models/comment_model";
 import userModel, { IUser } from "../models/users_model";
@@ -23,7 +23,8 @@ const testComments = JSON.parse(fs.readFileSync("./src/tests/test_comments.json"
 
 beforeAll(async () => {
   console.log("beforeAll - Setting up test environment");
-  app = await initApp();
+  const { app: initializedApp } = await initApp();
+  app = initializedApp;
   await commentsModel.deleteMany(); 
   await userModel.deleteMany(); 
 

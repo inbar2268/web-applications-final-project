@@ -3,8 +3,11 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
+import { authMiddleware } from "../controllers/auth_controller"; 
+import dotenv from "dotenv";
 
 const router = express.Router();
+dotenv.config();
 
 const base = process.env.DOMAIN_BASE || "http://localhost:3000";
 const uploadDir = path.resolve(__dirname, "../../uploads");
@@ -35,7 +38,7 @@ const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.
 
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
-router.post("/", (req, res) => {
+router.post("/", authMiddleware, (req, res) => {  
     upload.single("file")(req, res, (err) => {
         if (err instanceof multer.MulterError) {
             return res.status(400).json({ error: "File upload error." });
