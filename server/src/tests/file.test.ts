@@ -4,13 +4,34 @@ import mongoose from "mongoose";
 import { Express } from "express";
 import fs from "fs";
 import path from "path";
-import { URL } from "url";
+import userModel, { IUser } from "../models/users_model";
 
 var app: Express;
+let accessToken: string = "";
+
+const testUser: IUser = {
+  username: "testuser",
+  email: "testuser@example.com",
+  password: "testpassword",
+  profilePicture: "https://example.com/profile.jpg",
+};
 
 beforeAll(async () => {
   console.log("beforeAll - Setting up test environment");
   ({ app } = await initApp());
+
+  await userModel.deleteMany();
+
+  await request(app).post("/auth/register").send(testUser);
+  const response = await request(app).post("/auth/login").send({
+    email: testUser.email,
+    password: testUser.password,
+    username: testUser.username,
+  });
+
+  expect(response.statusCode).toBe(200);
+  accessToken = response.body.accessToken;
+  expect(accessToken).toBeDefined();
 });
 
 afterAll(async () => {
@@ -19,11 +40,16 @@ afterAll(async () => {
 });
 
 describe("File Upload Tests", () => {
-  test("Upload & Retrieve Image File", async () => {
+  test("Upload & Retrieve Image File (Authenticated)", async () => {
     const filePath = path.join(__dirname, "test_image.png");
+
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, ""); 
+    }
 
     const uploadResponse = await request(app)
       .post("/file")
+      .set("Authorization", "JWT " + accessToken) 
       .attach("file", filePath);
 
     expect(uploadResponse.statusCode).toBe(200);
@@ -32,20 +58,14 @@ describe("File Upload Tests", () => {
     let fileUrl = uploadResponse.body.url;
     console.log("Generated File URL:", fileUrl);
 
-    try {
-      const parsedUrl = new URL(fileUrl);
-      fileUrl = parsedUrl.pathname;
-    } catch (error) {
-      console.error("URL Parsing Error:", error);
-    }
-
+    fileUrl = new URL(fileUrl).pathname; 
     console.log("Formatted File URL for Test:", fileUrl);
 
     const fileResponse = await request(app).get(fileUrl);
     expect(fileResponse.statusCode).toBe(200);
   });
 
-  test("Reject Non-Image File Upload", async () => {
+  test("Reject Non-Image File Upload (Authenticated)", async () => {
     const filePath = path.join(__dirname, "test_file.txt");
 
     if (!fs.existsSync(filePath)) {
@@ -54,6 +74,7 @@ describe("File Upload Tests", () => {
 
     const uploadResponse = await request(app)
       .post("/file")
+      .set("Authorization", "JWT " + accessToken)
       .attach("file", filePath);
 
     expect(uploadResponse.statusCode).toBe(400);
