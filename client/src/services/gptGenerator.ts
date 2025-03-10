@@ -4,7 +4,7 @@ import apiClient from "./apiClient";
 export const generateRecipe = (dishName: string) => {
     return new Promise<string>((resolve, reject) => {
       apiClient
-        .post(`/posts/generate`, {dishName: dishName})
+        .post(`/recipes/generate`, {dishName: dishName})
         .then((response) => {
           resolve(response.data);
         })

@@ -12,30 +12,30 @@ import {
 } from '@mui/material';
 import { generateRecipe } from '../services/gptGenerator';
 
-export const GPTGeneratorPage = () => {
+export const RecipeGeneratorPage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [prompt, setPrompt] = useState('');
-  const [generatedContent, setGeneratedContent] = useState('');
+  const [dishName, setDishName] = useState('');
+  const [generatedRecipe, setGeneratedRecipe] = useState('');
 
-  const handlePromptChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPrompt(event.target.value);
+  const handleDishNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDishName(event.target.value);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
-    if (!prompt.trim()) {
+    if (!dishName.trim()) {
       return;
     }
     
     setIsLoading(true);
     
     try {
-      const content = await generateRecipe(prompt);
-      setGeneratedContent(content);
+      const recipe = await generateRecipe(dishName);
+      setGeneratedRecipe(recipe);
     } catch (error) {
-        setGeneratedContent("Error generating content. Please try again.");
-        console.error("Error generating content:", error);
+        setGeneratedRecipe("Error generating recipe. Please try again.");
+        console.error("Error generating recipe:", error);
     } finally {
       setIsLoading(false);
     }
@@ -51,8 +51,8 @@ export const GPTGeneratorPage = () => {
       sx={{ 
         mt: 4, 
         mb: 8,
-        height: 500, 
-        width: 1500, 
+        height: 500, // Keeping original fixed height
+        width: 1500, // Keeping original fixed width
         position: 'relative'
       }}
     >
@@ -78,7 +78,7 @@ export const GPTGeneratorPage = () => {
           p: 4, 
           borderRadius: 2,
           backgroundColor: '#FFF8F3',
-          position: 'absolute',
+          position: 'absolute', // Keeping original absolute positioning
           top: headerHeight,
           bottom: 0,
           left: 0,
@@ -102,7 +102,7 @@ export const GPTGeneratorPage = () => {
               alignItems: 'center'
             }}
           >
-            Create Your Prompt
+            Enter Dish Name
           </Typography>
           
           <form 
@@ -125,12 +125,12 @@ export const GPTGeneratorPage = () => {
             }}>
               <TextField
                 fullWidth
-                label="Enter your prompt"
+                label="Enter a dish name"
                 multiline
-                value={prompt}
-                onChange={handlePromptChange}
+                value={dishName}
+                onChange={handleDishNameChange}
                 variant="outlined"
-                placeholder="Describe what you'd like the AI to generate..."
+                placeholder="Enter the name of a dish you'd like a recipe for..."
                 sx={{ 
                   height: '100%',
                   '& .MuiInputBase-root': {
@@ -155,7 +155,7 @@ export const GPTGeneratorPage = () => {
                 type="submit"
                 variant="contained"
                 fullWidth
-                disabled={isLoading || !prompt.trim()}
+                disabled={isLoading || !dishName.trim()}
                 sx={{
                   height: '100%',
                   backgroundColor: '#E8B08E',
@@ -171,7 +171,7 @@ export const GPTGeneratorPage = () => {
                 {isLoading ? (
                   <CircularProgress size={24} sx={{ color: 'white' }} />
                 ) : (
-                  "Generate Content"
+                  "Generate Recipe"
                 )}
               </Button>
             </Box>
@@ -193,7 +193,7 @@ export const GPTGeneratorPage = () => {
               alignItems: 'center'
             }}
           >
-            Generated Content
+            Your Recipe
           </Typography>
           
           <Card 
@@ -205,38 +205,45 @@ export const GPTGeneratorPage = () => {
               left: 16,
               right: 0,
               borderColor: '#E8B08E',
-              borderWidth: '2px'
+              borderWidth: '2px',
+              display: 'flex',
+              flexDirection: 'column'
             }}
           >
             <CardContent sx={{ 
-              height: '100%',
               padding: 2,
               "&:last-child": {
                 paddingBottom: 2
-              }
+              },
+              flexGrow: 1,
+              display: 'flex',
+              height: '100%', // Ensure full height
+              overflow: 'hidden' // Prevent overflow from breaking layout
             }}>
               {isLoading ? (
                 <Box sx={{ 
                   display: 'flex', 
                   justifyContent: 'center', 
                   alignItems: 'center', 
-                  height: '100%' 
+                  width: '100%' 
                 }}>
                   <CircularProgress sx={{ color: '#E8B08E' }} />
                 </Box>
-              ) : generatedContent ? (
+              ) : generatedRecipe ? (
                 <Box sx={{ 
+                  width: '100%',
                   height: '100%',
-                  overflow: 'auto'
+                  overflow: 'auto' // Enable scrolling within the fixed container
                 }}>
                   <Typography 
                     variant="body1" 
                     component="div" 
                     sx={{ 
-                      whiteSpace: 'pre-wrap'
+                      whiteSpace: 'pre-wrap',
+                      overflowWrap: 'break-word' // Ensure text wraps properly
                     }}
                   >
-                    {generatedContent}
+                    {generatedRecipe}
                   </Typography>
                 </Box>
               ) : (
@@ -244,15 +251,16 @@ export const GPTGeneratorPage = () => {
                   display: 'flex', 
                   justifyContent: 'center', 
                   alignItems: 'center',
+                  width: '100%',
                   height: '100%',
                   flexDirection: 'column',
                   color: 'text.secondary'
                 }}>
                   <Typography variant="body1" align="center">
-                    Your generated content will appear here
+                    Your recipe will appear here
                   </Typography>
                   <Typography variant="body2" align="center" sx={{ mt: 1 }}>
-                    Enter a prompt and click "Generate Content"
+                    Enter a dish name and click "Generate Recipe"
                   </Typography>
                 </Box>
               )}
@@ -264,4 +272,4 @@ export const GPTGeneratorPage = () => {
   );
 };
 
-export default GPTGeneratorPage;
+export default RecipeGeneratorPage;

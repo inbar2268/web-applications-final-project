@@ -29,25 +29,25 @@ class recipeController {
                 messages: [
                     {
                         role: "system",
-                        content: "You are a professional chef who provides detailed recipes.",
+                        content: "You are a chef who provides concise, simplified recipes. Keep your responses brief and to the point.",
                     },
                     {
                         role: "user",
-                        content: `Generate a detailed recipe for the dish: ${dishName}. Include ingredients, step-by-step instructions, and serving suggestions.`,
+                        content: `Generate a simplified recipe for: ${dishName}. Include only essential ingredients and brief instructions. Keep it under 200 words.`,
                     },
                 ],
                 max_tokens: 250,
+                temperature: 0.7
             });
 
             const generatedRecipe = response.choices[0]?.message?.content?.trim();
 
             if (!generatedRecipe) {
+                console.error("Error generating recipe:", response);
+
                 res.status(500).json("Failed to generate recipe");
                 return;
             }
-
-            console.log("Recipe Generated:", generatedRecipe);
-
             res.status(200).send(generatedRecipe);
         } catch (error) {
             console.error("Error generating recipe:", error);
