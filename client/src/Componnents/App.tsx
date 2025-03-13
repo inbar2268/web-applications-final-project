@@ -9,6 +9,9 @@ import SignUp from "./SignUp";
 import GPTGeneratorPage from "./GptGenerator";
 import { Provider } from "react-redux";
 import { store } from "../Redux/store";
+import ChatPage from './chatPage'
+import ChatPage1 from './ChatPage1'
+
 
 function App() {
   return (
@@ -19,9 +22,13 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/generate-recipe" element={< GPTGeneratorPage/>} />
           <Route path="/Profile/:_id" element={<UserDetails />} />
-        </Route>
+          <Route path="/chat" element={<ChatPage1 />} />
+
+          </Route>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/chat/:chatId" element={<ChatPage />} />
+
       </Routes>
     </BrowserRouter>
     </Provider>
