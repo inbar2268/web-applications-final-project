@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./Layout";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
-import GPTGeneratorPage from "./gptGenerator";
+import GPTGeneratorPage from "./GptGenerator";
 import { Provider } from "react-redux";
 import { store } from "../Redux/store";
 

@@ -200,7 +200,7 @@ function Layout() {
                 </Button>
               ))}
             </Box>
-            {(
+            { !emptyUser() &&(
               <Tooltip title="Generate Recipe">
                 <IconButton
                   onClick={handleGenerateRecipe}
