@@ -3,6 +3,7 @@ import { loggedUserReducer } from "./slices/loggedUserSlice";
 import { usersReducer } from "./slices/usersSlice";
 import { postsReducer } from "./slices/postsSlice";
 import { chatReducer } from './slices/chatSlice';
+import userMiddleware from "./userMiddleware";
 
 export const createStore = () =>
   configureStore({
@@ -12,6 +13,7 @@ export const createStore = () =>
       posts: postsReducer,
       chat: chatReducer,
     },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(userMiddleware),
   });
 
 export const store = createStore();

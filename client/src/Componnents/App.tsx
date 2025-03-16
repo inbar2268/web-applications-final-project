@@ -10,9 +10,14 @@ import GPTGeneratorPage from "./GptGenerator";
 import { Provider } from "react-redux";
 import { store } from "../Redux/store";
 import ChatPage from './chatPage'
+import { useEffect } from "react";
 
 
 function App() {
+  useEffect(() => {
+    store.dispatch({ type: "INIT_APP" });
+  }, []);
+
   return (
     <Provider store={store}>
     <BrowserRouter>
