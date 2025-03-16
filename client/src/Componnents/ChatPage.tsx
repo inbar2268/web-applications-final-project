@@ -19,6 +19,7 @@ import SendIcon from '@mui/icons-material/Send';
 import IMessage from '../interfaces/message.ts'
 import IChat from '../interfaces/chat.ts'
 import IUser from '../interfaces/user.ts'
+import { getUserChats, getUserById, sendMessage } from '../services/chatService';
 
 
 const ChatPage: React.FC = () => {
@@ -85,60 +86,58 @@ const ChatPage: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const fetchChatData = async () => {
-    try {
-      setLoading(true);
-      setError('');
+  const fetchChatData = () => {
+    setLoading(true);
+    setError('');
 
-      if (!chatId || chatId === 'null') {
-        setError('No chat selected. Please try again.');
-        setLoading(false);
-        return;
-      }
-      
-      const response = await apiClient.get(`/chats/${String(currentUser._id)}`);
-      const chatData = response.data;
-
-      if (!chatData) {
-        setError('Chat not found');
-        setLoading(false);
-        return;
-      }
-
-      const currentChat = chatData.find(chat => chat._id === chatId);
-
-      if (!currentChat) {
-        setError('Chat not found');
-        setLoading(false);
-        return;
-      }
-
-      setChat(currentChat);
-      setMessages(currentChat.messages || []);
-
-        
-        if (otherUserId) {
-          try {
-            const userResponse = await apiClient.get(`/users/${otherUserId}`);
-            setOtherUser(userResponse.data);
-          } catch (userErr) {
-            console.error('Error fetching other user:', userErr);
-          }
-        }
-       else {
-        console.error('Invalid participants data:');
-        setError('No participants found in this chat.');
-      }
-
+    if (!chatId || chatId === 'null') {
+      setError('No chat selected. Please try again.');
       setLoading(false);
-    } catch (err) {
-      console.error('Error fetching chat data:', err);
-      setError('Failed to load chat data. Please try again later.');
-      setLoading(false);
+      return;
     }
+    
+    getUserChats(String(currentUser._id))
+      .then((chatData) => {
+        if (!chatData) {
+          setError('Chat not found');
+          setLoading(false);
+          return;
+        }
+
+        const currentChat = chatData.find(chat => chat._id === chatId);
+
+        if (!currentChat) {
+          setError('Chat not found');
+          setLoading(false);
+          return;
+        }
+
+        setChat(currentChat);
+        setMessages(currentChat.messages || []);
+
+        if (otherUserId) {
+          getUserById(otherUserId)
+            .then((userData) => {
+              setOtherUser(userData);
+            })
+            .catch((userErr) => {
+              console.error('Error fetching other user:', userErr);
+            });
+        } else {
+          console.error('Invalid participants data:');
+          setError('No participants found in this chat.');
+        }
+
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching chat data:', err);
+        setError('Failed to load chat data. Please try again later.');
+        setLoading(false);
+      });
   };
 
-  const sendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!newMessage.trim() || !chatId || !currentUser?._id || !otherUser?._id) return;
@@ -149,21 +148,13 @@ const ChatPage: React.FC = () => {
         receiverId: otherUser._id,
         message: newMessage
       };
+  
+      sendMessage(chatId, messageToSend)
+      .then((response) => {
+        setMessages(prev => [...prev, response]);
+        setNewMessage("")
+      }) 
 
-      await apiClient.post(`/chats/${chatId}/messages`, messageToSend);
-      
-      setNewMessage('');
-      
-
-      const optimisticMessage: IMessage = {
-        _id: `temp-${Date.now()}`,
-        senderId: currentUser._id,
-        receiverId: otherUser._id,
-        content: newMessage,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, optimisticMessage]);
     } catch (err) {
       console.error('Error sending message:', err);
       setError('Failed to send message. Please try again.');
@@ -408,7 +399,7 @@ const ChatPage: React.FC = () => {
           
           <Box 
             component="form"
-            onSubmit={sendMessage}
+            onSubmit={handleSendMessage}
             sx={{ 
               bgcolor: 'white', 
               borderTop: 1, 
