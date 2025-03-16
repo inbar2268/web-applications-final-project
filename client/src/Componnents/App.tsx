@@ -9,7 +9,9 @@ import SignUp from "./SignUp";
 import GPTGeneratorPage from "./GptGenerator";
 import { Provider } from "react-redux";
 import { store } from "../Redux/store";
+import ChatPage from './chatPage'
 import { useEffect } from "react";
+
 
 function App() {
   useEffect(() => {
@@ -18,17 +20,20 @@ function App() {
 
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="/generate-recipe" element={<GPTGeneratorPage />} />
-            <Route path="/Profile/:_id" element={<UserDetails />} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="/generate-recipe" element={< GPTGeneratorPage/>} />
+          <Route path="/Profile/:_id" element={<UserDetails />} />
+
           </Route>
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-        </Routes>
-      </BrowserRouter>
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/chat/:chatId" element={<ChatPage />} />
+
+      </Routes>
+    </BrowserRouter>
     </Provider>
   );
 }

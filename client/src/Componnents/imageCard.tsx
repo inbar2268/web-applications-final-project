@@ -41,6 +41,7 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
                 ?.profilePicture
             }
             onClick={() =>
+              
               navigate(`/profile/${user?._id}`, { state: { user } })
             }
           ></Avatar>

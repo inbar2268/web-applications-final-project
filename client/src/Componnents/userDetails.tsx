@@ -1,4 +1,4 @@
-import { Box, IconButton, ImageList, ImageListItem } from "@mui/material";
+import { Box, Button, IconButton, ImageList, ImageListItem } from "@mui/material";
 import "./App.css";
 // import { mockPosts } from "../mocData";
 import { IUser } from "../interfaces/user";
@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import Divider from "@mui/material/Divider";
 import { IPost } from "../interfaces/post";
 import EditIcon from "@mui/icons-material/Edit";
+import ChatIcon from "@mui/icons-material/Chat";
+import ChatButton from './ChatButton';
+
 import UserEditMode from "./userEditMode";
 import UserViewMode from "./UserViewMode";
 import { ImageModal } from "./ImageModal";
@@ -17,7 +20,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectPosts } from "../Redux/slices/postsSlice";
 import { updateUser } from "../Redux/slices/usersSlice";
 import { editUser } from "../services/usersService";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { startChat } from "../Redux/slices/chatSlice"; 
+
 
 function UserDetails() {
   const location = useLocation();
@@ -29,6 +34,7 @@ function UserDetails() {
   const allPosts = useSelector(selectPosts);
   const [selectedPost, setSelectedPost] = useState<IPost>(allPosts[0]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   function handleClickOnImage(post: IPost) {
     setSelectedPost(post);
@@ -55,6 +61,7 @@ function UserDetails() {
     dispatch(updateUser(user));
     setEditMode(false);
   }
+
   return (
     <div>
       <Box
@@ -68,23 +75,35 @@ function UserDetails() {
       >
         {!editMode ? (
           <>
-            {user._id === loggedUser?._id && (
-              <IconButton
-                aria-label="edit"
-                onClick={() => setEditMode(!editMode)}
-                sx={{
-                  float: "right",
-                  color: "#B05219",
-                  width: "1.8rem",
-                  height: "1.8rem",
-                  top: "80%",
-                  "&:focus": { outline: "none" },
-                  "&:focus-visible": { outline: "none" },
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-            )}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 1,
+                position: "absolute",
+                right: "8px",
+                bottom: "8px",
+              }}
+            >
+              {user._id !== loggedUser?._id && loggedUser?.username !== "" && (
+              <ChatButton userId={user._id} />
+              )}
+              {user._id === loggedUser?._id && (
+                <IconButton
+                  aria-label="edit"
+                  onClick={() => setEditMode(!editMode)}
+                  sx={{
+                    color: "#B05219",
+                    width: "1.8rem",
+                    height: "1.8rem",
+                    "&:focus": { outline: "none" },
+                    "&:focus-visible": { outline: "none" },
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+              )}
+            </Box>
             <UserViewMode user={user} />
           </>
         ) : (
