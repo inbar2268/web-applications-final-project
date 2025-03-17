@@ -28,6 +28,9 @@ import { getUsers } from "../services/usersService";
 import { selectUsers, updateUsersArray } from "../Redux/slices/usersSlice";
 import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 import { LikeIcon } from "./like";
+import { AddPostPage } from "./AddPost";
+import { Fab } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 function Home() {
   const posts = useSelector(selectPosts);
@@ -39,6 +42,7 @@ function Home() {
   const dispatch = useDispatch();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [openAddPostModal, setOpenAddPostModal] = useState(false);
   const [notification, setNotification] = useState({
     open: false,
     message: "",
@@ -88,10 +92,6 @@ function Home() {
     }
   };
 
-  const handleCloseNotification = () => {
-    setNotification({...notification, open: false});
-  };
-
   useEffect(() => {
     setReverseItems([...posts].reverse());
   }, [posts]);
@@ -109,6 +109,23 @@ function Home() {
   function isUserLoggedIn(): boolean {
     return !(currentUser.username === "" && currentUser.email === "" && currentUser.password === "");
   }
+
+  
+  const handleAddPostClick = () => {
+    setOpenAddPostModal(true); 
+  };
+
+  const handleCloseNotification = () => {
+    setNotification({...notification, open: false});
+  };
+  const handlePostSubmissionResult = (success: boolean) => {
+    setOpenAddPostModal(false); 
+    setNotification({
+      open: true,
+      message: success ? "Post created successfully!" : "Failed to create post. Please try again.",
+      severity: success ? "success" : "error"
+    });
+  };
 
   return (
     <div>
@@ -249,6 +266,35 @@ function Home() {
           {notification.message}
         </Alert>
       </Snackbar>
+      {isUserLoggedIn() && (
+        <Fab 
+          color="primary" 
+          aria-label="add post"
+          onClick={handleAddPostClick}
+          sx={{
+            position: 'fixed',
+            bottom: 20,
+            left: 20,
+            backgroundColor: '#E8B08E',
+            '&:hover': {
+              backgroundColor: '#B05219',
+            },
+            '&:active': {
+              backgroundColor: '#B05219',
+              transform: 'none', 
+            },
+            boxShadow: '0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)',
+          }}
+        >
+          <AddIcon />
+        </Fab>
+      )}
+      {openAddPostModal && (
+        <AddPostPage
+          handleClose={() => setOpenAddPostModal(false)}
+          onSubmitResult={handlePostSubmissionResult}
+        />
+      )}
     </div>
   );
 }
