@@ -190,49 +190,55 @@ type tUser = Document<unknown, {}, IUser> & IUser & Required<{
     __v: number;
 }
 
-const verifyRefreshToken = (refreshToken: string | undefined) => {
+const verifyRefreshToken = async (refreshToken: string | undefined) => {
     return new Promise<tUser>((resolve, reject) => {
-        //get refresh token from body
         if (!refreshToken) {
             reject("fail");
             return;
         }
-        //verify token
-        if (!process.env.TOKEN_SECRET) {
+
+        const tokenSecret = process.env.TOKEN_SECRET;
+        if (!tokenSecret) {
             reject("fail");
             return;
         }
-        jwt.verify(refreshToken, process.env.TOKEN_SECRET, async (err: any, payload: any) => {
+
+        jwt.verify(refreshToken, tokenSecret, async (err: any, payload: any) => {
             if (err) {
                 reject("fail");
-                return
+                return;
             }
-            //get the user id fromn token
+
             const userId = payload._id;
+
             try {
-                //get the user form the db
                 const user = await UserModel.findById(userId);
                 if (!user) {
                     reject("fail");
                     return;
                 }
-                if (!user.refreshToken || !user.refreshToken.includes(refreshToken)) {
-                    user.refreshToken = [];
-                    await user.save();
-                    reject("fail");
+
+                user.refreshToken = user.refreshToken || [];
+                user.refreshToken = user.refreshToken.filter((token) => token !== refreshToken);
+
+                const newTokens = generateToken(user._id);
+                if (!newTokens || !newTokens.refreshToken) {
+                    reject("Server Error");
                     return;
                 }
-                const tokens = user.refreshToken!.filter((token) => token !== refreshToken);
-                user.refreshToken = tokens;
+
+                user.refreshToken.push(newTokens.refreshToken);
+                await user.save();
 
                 resolve(user);
             } catch (err) {
                 reject("fail");
-                return;
             }
         });
     });
-}
+};
+
+
 
 const logout = async (req: Request, res: Response) => {
     try {
