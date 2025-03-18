@@ -127,9 +127,17 @@ function Home() {
     });
   };
 
+  const getColumnCount = () => {
+    if (reverseItems.length <= 1) return 1;
+    if (reverseItems.length <= 3) return 2;
+    return 3;
+  };
+
   return (
     <div>
-      <ImageList variant="masonry" cols={3} gap={8}>
+      <ImageList variant="masonry" 
+          cols={getColumnCount()} 
+          gap={8}>
         {reverseItems.map((item) => {
           const user = users.find((user) => user._id === item.userId);
           const isUsersPost = isUserLoggedIn() && currentUser._id === item.userId;
@@ -137,6 +145,7 @@ function Home() {
 
           return (
             <ImageListItem
+              sx={{minWidth: "400px"}}
               key={item.image}
               onClick={() => handleClickOnImage(item)}
             >
