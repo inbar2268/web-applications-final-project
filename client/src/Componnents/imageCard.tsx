@@ -14,6 +14,7 @@ import { selectUsers } from "../Redux/slices/usersSlice";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { LikeIcon } from "./like";
+import { EditPostPage } from "./EditPost";
 
 interface IRecipeReviewCardProps extends IconButtonProps {
   post: IPost;
@@ -22,16 +23,24 @@ interface IRecipeReviewCardProps extends IconButtonProps {
 export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
   const users = useSelector(selectUsers);
   const navigate = useNavigate();
+  const [post, setPost] = useState(props.post);
   const [user, setUser] = useState(
-    users.find((user) => user._id === props.post.userId)
+    users.find((user) => user._id === post.userId)
   );
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageNaturalWidth, setImageNaturalWidth] = useState(0);
   const [imageNaturalHeight, setImageNaturalHeight] = useState(0);
+  const [openEditPostModal, setOpenEditPostModal] = useState(false);
+
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
 
   useEffect(() => {
-    setUser(users.find((user) => user._id === props.post.userId));
-  }, [users, props.post.userId]);
+    setUser(users.find((user) => user._id === post.userId));
+  }, [users, post.userId]);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -41,20 +50,31 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
     console.log("1");
   };
 
+  const handlePostSubmissionResult = (success: boolean) => {
+    setOpenEditPostModal(false);
+    setNotification({
+      open: true,
+      message: success
+        ? "Post updated successfully!"
+        : "Failed to update post. Please try again.",
+      severity: success ? "success" : "error",
+    });
+  };
+
   return (
-    <Card sx={{ width: "100%", maxHeight: "35rem" , minWidth: "300px"}}>
+    <Card sx={{ width: "100%", maxHeight: "35rem", minWidth: "300px" }}>
       <CardHeader
         avatar={
           <Avatar
             sx={{ bgcolor: red[500], cursor: "pointer" }}
             aria-label="recipe"
-            src={
-              users.find((user) => user._id === props.post.userId)?.profilePicture
+            src={users.find((user) => user._id === post.userId)?.profilePicture}
+            onClick={() =>
+              navigate(`/profile/${user?._id}`, { state: { user } })
             }
-            onClick={() => navigate(`/profile/${user?._id}`, { state: { user } })}
           ></Avatar>
         }
-        title={props.post.title}
+        title={post.title}
       />
       <Box
         sx={{
@@ -65,20 +85,26 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
           backgroundColor: "#f5f5f5",
           minHeight: "194px",
           maxHeight: "400px",
-          minWidth: "300px"
+          minWidth: "300px",
         }}
       >
         <CardMedia
           component="img"
-          image={props.post.image}
-          alt={props.post.title}
+          image={post.image}
+          alt={post.title}
           onLoad={handleImageLoad}
           sx={{
             maxHeight: "400px",
             width: "auto",
             maxWidth: "100%",
-            objectFit: imageNaturalWidth < 300 || imageNaturalHeight < 300 ? "contain" : "cover",
-            border: imageNaturalWidth < 300 || imageNaturalHeight < 300 ? "1px solid #e0e0e0" : "none",
+            objectFit:
+              imageNaturalWidth < 300 || imageNaturalHeight < 300
+                ? "contain"
+                : "cover",
+            border:
+              imageNaturalWidth < 300 || imageNaturalHeight < 300
+                ? "1px solid #e0e0e0"
+                : "none",
           }}
         />
       </Box>
@@ -106,15 +132,15 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
         }}
       >
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {props.post.content}
+          {post.content}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <LikeIcon post={props.post} />
+        <LikeIcon post={post} />
         {/* TODO: SHOW ONLY FOR CONNECTED USER POSTS */}
         <Button
           aria-label="edit"
-          // TODO: onClick={() => setEditMode(!editMode)}
+          onClick={() => setOpenEditPostModal(!openEditPostModal)}
           sx={{
             marginLeft: "auto",
             color: "#B05219",
@@ -125,7 +151,14 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
           Edit Post
         </Button>
       </CardActions>
+      {openEditPostModal && (
+        <EditPostPage
+          handleClose={() => setOpenEditPostModal(false)}
+          onSubmitResult={handlePostSubmissionResult}
+          updatePost={setPost}
+          post={post}
+        />
+      )}
     </Card>
   );
 }
-
