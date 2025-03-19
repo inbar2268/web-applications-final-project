@@ -13,6 +13,7 @@ import recipeRoute from "./routes/recipe_route";
 import chatRoute from "./routes/chat_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
+import path from "path";
 
 dotenv.config();
 
@@ -64,7 +65,7 @@ app.use("/file", fileRoute);
 app.use("/chats", chatRoute);
 app.use("/recipes", recipeRoute);
 app.use("/public", express.static("public"));
-app.use("/uploads", express.static("uploads"));
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 const PORT = process.env.PORT || 5000;
 const options = {

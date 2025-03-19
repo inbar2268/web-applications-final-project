@@ -31,7 +31,7 @@ apiClient.interceptors.request.use(
         const refreshToken = sessionStorage.getItem('refreshToken');
         if (refreshToken) {
           try {
-            const response = await axios.post(`/auth/refresh`, {refreshToken});
+            const response = await apiClient.post(`/auth/refresh`, {refreshToken});
             const newAccessToken = response.data.accessToken;
             sessionStorage.setItem('accessToken', newAccessToken); 
             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

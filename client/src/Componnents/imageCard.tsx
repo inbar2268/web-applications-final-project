@@ -8,7 +8,7 @@ import { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { red } from "@mui/material/colors";
 import { IPost } from "../interfaces/post";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectUsers } from "../Redux/slices/usersSlice";
 import { useNavigate } from "react-router-dom";
@@ -25,35 +25,63 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
   const [user, setUser] = useState(
     users.find((user) => user._id === props.post.userId)
   );
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageNaturalWidth, setImageNaturalWidth] = useState(0);
+  const [imageNaturalHeight, setImageNaturalHeight] = useState(0);
 
   useEffect(() => {
     setUser(users.find((user) => user._id === props.post.userId));
-  });
+  }, [users, props.post.userId]);
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setImageNaturalWidth(img.naturalWidth);
+    setImageNaturalHeight(img.naturalHeight);
+    setImageLoaded(true);
+    console.log("1");
+  };
+
   return (
-    <Card sx={{ width: "40rem", maxHeight: "35rem" }}>
+    <Card sx={{ width: "100%", maxHeight: "35rem" , minWidth: "300px"}}>
       <CardHeader
         avatar={
           <Avatar
-            sx={{ bgcolor: red[500] }}
+            sx={{ bgcolor: red[500], cursor: "pointer" }}
             aria-label="recipe"
             src={
-              users.find((user) => user._id === props.post.userId)
-                ?.profilePicture
+              users.find((user) => user._id === props.post.userId)?.profilePicture
             }
-            onClick={() =>
-              
-              navigate(`/profile/${user?._id}`, { state: { user } })
-            }
+            onClick={() => navigate(`/profile/${user?._id}`, { state: { user } })}
           ></Avatar>
         }
         title={props.post.title}
       />
-      <CardMedia
-        component="img"
-        height="194"
-        image={props.post.image}
-        alt={props.post.title}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          overflow: "hidden",
+          backgroundColor: "#f5f5f5",
+          minHeight: "194px",
+          maxHeight: "400px",
+          minWidth: "300px"
+        }}
+      >
+        <CardMedia
+          component="img"
+          image={props.post.image}
+          alt={props.post.title}
+          onLoad={handleImageLoad}
+          sx={{
+            maxHeight: "400px",
+            width: "auto",
+            maxWidth: "100%",
+            objectFit: imageNaturalWidth < 300 || imageNaturalHeight < 300 ? "contain" : "cover",
+            border: imageNaturalWidth < 300 || imageNaturalHeight < 300 ? "1px solid #e0e0e0" : "none",
+          }}
+        />
+      </Box>
       <CardContent
         sx={{
           flexGrow: 1,
@@ -83,13 +111,12 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
       </CardContent>
       <CardActions disableSpacing>
         <LikeIcon post={props.post} />
-
-        {/* TODO: SHOW ONLY FOR CONNEXTED USER POSTS */}
+        {/* TODO: SHOW ONLY FOR CONNECTED USER POSTS */}
         <Button
           aria-label="edit"
-          //  TODO:  onClick={() => setEditMode(!editMode)}
+          // TODO: onClick={() => setEditMode(!editMode)}
           sx={{
-            float: "right",
+            marginLeft: "auto",
             color: "#B05219",
             "&:focus": { outline: "none" },
             "&:focus-visible": { outline: "none" },
@@ -101,3 +128,4 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
     </Card>
   );
 }
+
