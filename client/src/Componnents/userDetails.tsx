@@ -1,12 +1,5 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  ImageList,
-  ImageListItem,
-} from "@mui/material";
+import { Box, IconButton, ImageList, ImageListItem } from "@mui/material";
 import "./App.css";
-// import { mockPosts } from "../mocData";
 import { IUser } from "../interfaces/user";
 import { useEffect, useState } from "react";
 import Divider from "@mui/material/Divider";
@@ -39,7 +32,6 @@ function UserDetails() {
   const allPosts = useSelector(selectPosts);
   const [selectedPost, setSelectedPost] = useState<IPost>(allPosts[0]);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   function handleClickOnImage(post: IPost) {
     setSelectedPost(post);
@@ -48,7 +40,7 @@ function UserDetails() {
 
   useEffect(() => {
     filterUserPost();
-  }, [user]);
+  }, [user, allPosts]);
 
   useEffect(() => {
     if (location.state?.user) {
