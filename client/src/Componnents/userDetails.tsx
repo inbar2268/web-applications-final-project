@@ -1,4 +1,10 @@
-import { Box, Button, IconButton, ImageList, ImageListItem } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  ImageList,
+  ImageListItem,
+} from "@mui/material";
 import "./App.css";
 // import { mockPosts } from "../mocData";
 import { IUser } from "../interfaces/user";
@@ -7,7 +13,7 @@ import Divider from "@mui/material/Divider";
 import { IPost } from "../interfaces/post";
 import EditIcon from "@mui/icons-material/Edit";
 import ChatIcon from "@mui/icons-material/Chat";
-import ChatButton from './ChatButton';
+import ChatButton from "./ChatButton";
 
 import UserEditMode from "./userEditMode";
 import UserViewMode from "./UserViewMode";
@@ -21,8 +27,7 @@ import { selectPosts } from "../Redux/slices/postsSlice";
 import { updateUser } from "../Redux/slices/usersSlice";
 import { editUser } from "../services/usersService";
 import { useLocation, useNavigate } from "react-router-dom";
-import { startChat } from "../Redux/slices/chatSlice"; 
-
+import { startChat } from "../Redux/slices/chatSlice";
 
 function UserDetails() {
   const location = useLocation();
@@ -43,8 +48,13 @@ function UserDetails() {
 
   useEffect(() => {
     filterUserPost();
-  }, []);
+  }, [user]);
 
+  useEffect(() => {
+    if (location.state?.user) {
+      setUser(location.state.user);
+    }
+  }, [location.state]);
 
   function filterUserPost() {
     setPosts(allPosts.filter((post) => post.userId === user._id));
@@ -53,7 +63,7 @@ function UserDetails() {
   function onCancle() {
     setEditMode(false);
   }
-  
+
   function onCheck(user: IUser) {
     if (user._id) editUser(user._id, user);
     setUser(user);
@@ -86,7 +96,7 @@ function UserDetails() {
               }}
             >
               {user._id !== loggedUser?._id && loggedUser?.username !== "" && (
-              <ChatButton userId={user._id} />
+                <ChatButton userId={user._id} />
               )}
               {user._id === loggedUser?._id && (
                 <IconButton

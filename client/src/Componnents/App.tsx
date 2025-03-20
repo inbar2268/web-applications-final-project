@@ -25,7 +25,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="/generate-recipe" element={< GPTGeneratorPage/>} />
-          <Route path="/Profile/:_id" element={<UserDetails />} />
+          <Route path="/Profile/:_id" element={<UserDetails/>} />
 
           </Route>
         <Route path="/signin" element={<SignIn />} />
