@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { LikeIcon } from "./like";
 import { EditPostPage } from "./EditPost";
+import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 
 interface IRecipeReviewCardProps extends IconButtonProps {
   post: IPost;
@@ -22,6 +23,7 @@ interface IRecipeReviewCardProps extends IconButtonProps {
 
 export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
   const users = useSelector(selectUsers);
+  const loggrdUser = useSelector(selectLoggedUser);
   const navigate = useNavigate();
   const [post, setPost] = useState(props.post);
   const [user, setUser] = useState(
@@ -31,7 +33,6 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
   const [imageNaturalWidth, setImageNaturalWidth] = useState(0);
   const [imageNaturalHeight, setImageNaturalHeight] = useState(0);
   const [openEditPostModal, setOpenEditPostModal] = useState(false);
-
   const [notification, setNotification] = useState({
     open: false,
     message: "",
@@ -138,18 +139,19 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
       <CardActions disableSpacing>
         <LikeIcon post={post} />
         {/* TODO: SHOW ONLY FOR CONNECTED USER POSTS */}
-        <Button
-          aria-label="edit"
-          onClick={() => setOpenEditPostModal(!openEditPostModal)}
-          sx={{
-            marginLeft: "auto",
-            color: "#B05219",
-            "&:focus": { outline: "none" },
-            "&:focus-visible": { outline: "none" },
-          }}
-        >
-          Edit Post
-        </Button>
+        {loggrdUser._id == user?._id && (
+          <Button
+            aria-label="edit"
+            onClick={() => setOpenEditPostModal(!openEditPostModal)}
+            sx={{
+              color: "#B05219",
+              "&:focus": { outline: "none" },
+              "&:focus-visible": { outline: "none" },
+            }}
+          >
+            Edit Post
+          </Button>
+        )}
       </CardActions>
       {openEditPostModal && (
         <EditPostPage
