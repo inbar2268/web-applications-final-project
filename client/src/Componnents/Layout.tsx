@@ -65,7 +65,7 @@ function Layout() {
   const handleLogoutClick = () => {
     logout();
     dispatch(logoutRedux());
-    navigate("/");
+    navigate("/signin");
   };
 
   const handleGenerateRecipe = () => {

@@ -1,10 +1,5 @@
 import {
-  Avatar,
-  Box,
   ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
@@ -13,24 +8,21 @@ import {
   Button,
   Snackbar,
   Alert,
-  Typography
+  Fab
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import "./App.css";
 import { useEffect, useState } from "react";
 import { IPost } from "../interfaces/post";
 import { ImageModal } from "./ImageModal";
-import CommentPopup from "./Comments";
 import { getposts, deletePost } from "../services/postsService";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPosts, updatePostsArray } from "../Redux/slices/postsSlice";
 import { getUsers } from "../services/usersService";
 import { selectUsers, updateUsersArray } from "../Redux/slices/usersSlice";
 import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
-import { LikeIcon } from "./like";
 import { AddPostPage } from "./AddPost";
-import { Fab } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import PostListItem from "./PostListItem";
 
 function Home() {
   const posts = useSelector(selectPosts);
@@ -110,7 +102,6 @@ function Home() {
     return !(currentUser.username === "" && currentUser.email === "" && currentUser.password === "");
   }
 
-  
   const handleAddPostClick = () => {
     setOpenAddPostModal(true); 
   };
@@ -118,6 +109,7 @@ function Home() {
   const handleCloseNotification = () => {
     setNotification({...notification, open: false});
   };
+  
   const handlePostSubmissionResult = (success: boolean) => {
     setOpenAddPostModal(false); 
     setNotification({
@@ -135,85 +127,22 @@ function Home() {
 
   return (
     <div>
-      <ImageList variant="masonry" 
-          cols={getColumnCount()} 
-          gap={8}>
+      <ImageList 
+        variant="masonry" 
+        cols={getColumnCount()} 
+        gap={8}
+      >
         {reverseItems.map((item) => {
           const user = users.find((user) => user._id === item.userId);
-          const isUsersPost = isUserLoggedIn() && currentUser._id === item.userId;
-          const commentCount = item.commentsCount || 0;
-
+          
           return (
-            <ImageListItem
-              sx={{minWidth: "400px"}}
-              key={item.image}
-              onClick={() => handleClickOnImage(item)}
-            >
-              <img
-                srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                src={`${item.image}?w=248&fit=crop&auto=format`}
-                alt={item.title}
-                loading="lazy"
-              />
-              <ImageListItemBar
-                sx={{
-                  background:
-                    "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, " +
-                    "rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-                title={
-                  <div dir="rtl">
-                    <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                      <Avatar
-                        alt={user?.username.toUpperCase()}
-                        src={user?.profilePicture}
-                        sx={{ width: 35, height: 35, marginLeft: 2 }}
-                      />
-                      {item.title}
-                    </Box>
-                  </div>
-                }
-                position="top"
-                actionIcon={
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {isUsersPost && (
-                      <IconButton
-                        aria-label="delete post"
-                        onClick={(e) => handleDeleteClick(e, item._id)}
-                        sx={{
-                          color: 'white',
-                          '&:hover': {
-                            color: '#ff5252',
-                          },
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    )}
-                    <LikeIcon post={item} color="white" />
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <CommentPopup post={item} />
-                      <Typography 
-                        variant="body2" 
-                        component="span" 
-                        sx={{ 
-                          color: 'white', 
-                          fontSize: '0.8rem', 
-                          marginRight: '4px',
-                          fontWeight: 'medium'
-                        }}
-                      >
-                        {commentCount}
-                      </Typography>
-                    </Box>
-                  </Box>
-                }
-                actionPosition="left"
-              />
-            </ImageListItem>
+            <PostListItem
+              key={item._id}
+              post={item}
+              user={user}
+              onImageClick={handleClickOnImage}
+              onDeleteClick={handleDeleteClick}
+            />
           );
         })}
       </ImageList>
@@ -275,6 +204,7 @@ function Home() {
           {notification.message}
         </Alert>
       </Snackbar>
+      
       {isUserLoggedIn() && (
         <Fab 
           color="primary" 
@@ -298,6 +228,7 @@ function Home() {
           <AddIcon />
         </Fab>
       )}
+      
       {openAddPostModal && (
         <AddPostPage
           handleClose={() => setOpenAddPostModal(false)}
