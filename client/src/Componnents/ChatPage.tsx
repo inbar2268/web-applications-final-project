@@ -45,7 +45,7 @@ const ChatPage: React.FC = () => {
   const backgroundColor = "#f5f5f5";
 
   useEffect(() => {
-    if (!currentUser || !currentUser._id) {
+    if (!currentUser) {
       navigate("/signin");
     }
   }, [currentUser, navigate]);
