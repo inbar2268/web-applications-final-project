@@ -6,6 +6,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import { StyledTextField } from "../Styled/StyledTextfield";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
+import { uploadImg } from "../services/imageService";
+import { editUser } from "../services/usersService";
+import { updateLoggedUser } from "../Redux/slices/loggedUserSlice";
+import { updateUser } from "../Redux/slices/usersSlice";
+import { useDispatch } from "react-redux";
 
 interface IUserEditModeProps {
   user: IUser;
@@ -15,6 +20,7 @@ interface IUserEditModeProps {
 function UserEditMode(props: IUserEditModeProps) {
   const [user, setUser] = useState<IUser>(props.user);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const dispatch = useDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -25,16 +31,38 @@ function UserEditMode(props: IUserEditModeProps) {
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setUser({ ...user, profilePicture: imageUrl });
+      const previewUrl = URL.createObjectURL(file);
+      setUser({ ...user, profilePicture: previewUrl });
     }
   }
 
+  const handleConfirm = async () => {
+    if (fileInputRef.current?.files?.[0]) {
+      try {
+        const imageUrl = await uploadImg(fileInputRef.current.files[0]);
+
+        if (!imageUrl) {
+          console.error("Image upload failed");
+          return;
+        }
+        const updatedUser = { ...user, profilePicture: imageUrl };
+        props.onCheck(updatedUser);
+      } catch (error) {
+        console.error("Upload profile picture failed:", error);
+      }
+    } else {
+      props.onCheck(user);
+    }
+
+    editUser(user._id, user);
+    dispatch(updateLoggedUser(user));
+    dispatch(updateUser(user));
+  };
   return (
     <>
       <IconButton
         aria-label="edit"
-        onClick={() => props.onCheck(user)}
+        onClick={() => handleConfirm()}
         sx={{
           float: "right",
           color: "#B05219",
