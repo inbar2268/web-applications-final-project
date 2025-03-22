@@ -1,26 +1,30 @@
-import { Box, IconButton, ImageList, ImageListItem } from "@mui/material";
+import { Box, IconButton, ImageList } from "@mui/material";
 import "./App.css";
 import { IUser } from "../interfaces/user";
 import { useEffect, useState } from "react";
 import Divider from "@mui/material/Divider";
 import { IPost } from "../interfaces/post";
 import EditIcon from "@mui/icons-material/Edit";
-import ChatIcon from "@mui/icons-material/Chat";
 import ChatButton from "./ChatButton";
-
 import UserEditMode from "./userEditMode";
 import UserViewMode from "./UserViewMode";
 import { ImageModal } from "./ImageModal";
-import {
-  selectLoggedUser,
-  updateLoggedUser,
-} from "../Redux/slices/loggedUserSlice";
+import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { selectPosts } from "../Redux/slices/postsSlice";
-import { updateUser } from "../Redux/slices/usersSlice";
-import { editUser } from "../services/usersService";
+import { selectPosts, updatePostsArray } from "../Redux/slices/postsSlice";
 import { useLocation, useNavigate } from "react-router-dom";
-import { startChat } from "../Redux/slices/chatSlice";
+import PostListItem from "./PostListItem";
+import { deletePost } from "../services/postsService";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 
 function UserDetails() {
   const location = useLocation();
@@ -32,11 +36,69 @@ function UserDetails() {
   const allPosts = useSelector(selectPosts);
   const [selectedPost, setSelectedPost] = useState<IPost>(allPosts[0]);
   const dispatch = useDispatch();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
 
   function handleClickOnImage(post: IPost) {
     setSelectedPost(post);
     setOpenImage(true);
   }
+
+  const handleDeleteClick = (event: React.MouseEvent, postId: string) => {
+    event.stopPropagation();
+    setPostToDelete(postId);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setPostToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!postToDelete) return;
+
+    try {
+      await deletePost(postToDelete);
+
+      // Update local posts state
+      const updatedPosts = posts.filter((post) => post._id !== postToDelete);
+      setPosts(updatedPosts);
+
+      // Update global posts state
+      const updatedAllPosts = allPosts.filter(
+        (post) => post._id !== postToDelete
+      );
+      dispatch(updatePostsArray(updatedAllPosts));
+
+      setNotification({
+        open: true,
+        message: "Post deleted successfully!",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      setNotification({
+        open: true,
+        message: "Failed to delete post. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setOpenDeleteDialog(false);
+      setPostToDelete(null);
+    }
+  };
+
+  const handleCloseNotification = () => {
+    setNotification({ ...notification, open: false });
+  };
 
   useEffect(() => {
     filterUserPost();
@@ -56,12 +118,16 @@ function UserDetails() {
     setEditMode(false);
   }
 
-  function onCheck(user: IUser) {
-    if (user._id) editUser(user._id, user);
+  function confirmUpdateUser(user: IUser) {
     setUser(user);
-    dispatch(updateLoggedUser(user));
-    dispatch(updateUser(user));
     setEditMode(false);
+    navigate(location.pathname, {
+      replace: true,
+      state: {
+        ...location.state,
+        user: user,
+      },
+    });
   }
 
   return (
@@ -109,7 +175,11 @@ function UserDetails() {
             <UserViewMode user={user} />
           </>
         ) : (
-          <UserEditMode user={user} onCancle={onCancle} onCheck={onCheck} />
+          <UserEditMode
+            user={user}
+            onCancle={onCancle}
+            onCheck={confirmUpdateUser}
+          />
         )}
       </Box>
       <Divider
@@ -128,17 +198,13 @@ function UserDetails() {
       >
         <ImageList variant="masonry" cols={3} gap={8}>
           {posts.map((item) => (
-            <ImageListItem
-              key={item.image}
-              onClick={() => handleClickOnImage(item)}
-            >
-              <img
-                srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                src={`${item.image}?w=248&fit=crop&auto=format`}
-                alt={item.title}
-                loading="lazy"
-              />
-            </ImageListItem>
+            <PostListItem
+              key={item._id}
+              post={item}
+              user={user}
+              onImageClick={handleClickOnImage}
+              onDeleteClick={handleDeleteClick}
+            />
           ))}
         </ImageList>
         <ImageModal
@@ -146,6 +212,62 @@ function UserDetails() {
           seletedPost={selectedPost}
           setModaleState={setOpenImage}
         />
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={openDeleteDialog}
+          onClose={handleCloseDeleteDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Delete this post?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to delete this post? This action cannot be
+              undone.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDeleteDialog} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              color="error"
+              variant="contained"
+              autoFocus
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={notification.open}
+          autoHideDuration={6000}
+          onClose={handleCloseNotification}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseNotification}
+            severity={notification.severity}
+            sx={{
+              width: "100%",
+              backgroundColor:
+                notification.severity === "success" ? "#EDF7ED" : "#FDEDED",
+              color:
+                notification.severity === "success" ? "#1E4620" : "#5F2120",
+              "& .MuiAlert-icon": {
+                color:
+                  notification.severity === "success" ? "#4CAF50" : "#EF5350",
+              },
+            }}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </div>
   );

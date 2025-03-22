@@ -1,8 +1,8 @@
 import apiClient from "../services/apiClient";
 import { AxiosError } from "axios";
-import IMessage from '../interfaces/message';
-import IChat from '../interfaces/chat';
-import IUser from '../interfaces/user';
+import {IMessage} from '../interfaces/message';
+import {IChat} from '../interfaces/chat';
+import {IUser} from '../interfaces/user';
 
 interface SendMessagePayload {
   senderId: string;
