@@ -1,4 +1,5 @@
 import PostModel, { IPost } from "../models/posts_model";
+import CommentModel from "../models/comment_model";
 import { Request, Response } from "express";
 import BaseController from "./base_conroller";
 import userModel from "../models/users_model";
@@ -108,6 +109,21 @@ class postsController extends BaseController<IPost> {
         res.status(500).send({ error: "Server error" });
     }
   }
+  async deleteItem(req: Request, res: Response) {
+    const id = req.params.id;
+    try {
+      await CommentModel.deleteMany({ postId: id });
+      const rs = await this.model.findByIdAndDelete(id);
+      if (!rs) {
+        res.status(404).send({ error: "Item not found" });
+      } else {
+        res.status(200).send("deleted");
+      }
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  }
+  
 }
 
 export default new postsController();
