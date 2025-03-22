@@ -44,13 +44,13 @@ const ChatPage: React.FC = () => {
   const backgroundColor = "#f5f5f5";
 
   useEffect(() => {
-    if (!currentUser || !currentUser._id) {
+    if (!currentUser) {
       navigate("/signin");
     }
   }, [currentUser, navigate]);
 
   useEffect(() => {
-    if (!currentUser || !currentUser._id) return;
+    if (!currentUser) return;
 
     const socketUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
     socketRef.current = io(socketUrl);
@@ -80,7 +80,7 @@ const ChatPage: React.FC = () => {
   }, [currentUser, chatId]);
 
   useEffect(() => {
-    if (!currentUser || !currentUser._id) return;
+    if (!currentUser) return;
 
     fetchChatData();
   }, [currentUser, chatId]);
@@ -144,8 +144,7 @@ const ChatPage: React.FC = () => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newMessage.trim() || !chatId || !currentUser?._id || !otherUser?._id)
-      return;
+    if (!newMessage.trim() || !chatId || !otherUser?._id) return;
 
     try {
       const messageToSend = {
