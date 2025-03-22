@@ -12,7 +12,7 @@ import { ImageModal } from "./ImageModal";
 import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPosts, updatePostsArray } from "../Redux/slices/postsSlice";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PostListItem from "./PostListItem";
 import { deletePost } from "../services/postsService";
 import {
@@ -38,6 +38,8 @@ function UserDetails() {
   const dispatch = useDispatch();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const navigate = useNavigate();
+
   const [notification, setNotification] = useState({
     open: false,
     message: "",
@@ -119,6 +121,13 @@ function UserDetails() {
   function confirmUpdateUser(user: IUser) {
     setUser(user);
     setEditMode(false);
+    navigate(location.pathname, {
+      replace: true,
+      state: {
+        ...location.state,
+        user: user,
+      },
+    });
   }
 
   return (
