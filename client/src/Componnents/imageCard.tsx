@@ -62,8 +62,9 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
     });
   };
 
+
   return (
-    <Card sx={{ width: "100%", maxHeight: "35rem", minWidth: "300px" }}>
+    <Card sx={{ width: "100%", maxHeight: "35rem", minWidth: "300px", display: "flex", flexDirection: "column" }}>
       <CardHeader
         avatar={
           <Avatar
@@ -109,50 +110,75 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
           }}
         />
       </Box>
-      <CardContent
-        sx={{
-          flexGrow: 1,
-          overflowY: "auto",
-          maxHeight: "15rem",
-          "&::-webkit-scrollbar": {
-            width: "12px",
-            borderRadius: "8px",
-          },
-          "&::-webkit-scrollbar-track": {
-            background: "#F3E4D7",
-            borderRadius: "8px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: "#D1A890",
-            borderRadius: "8px",
-            border: "2px solid #F3E4D7",
-          },
-          "&::-webkit-scrollbar-thumb:hover": {
-            background: "#B28A73",
-          },
-        }}
-      >
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minHeight: 0 }}>
+        <CardContent
+          sx={{
+            flexGrow: 1,
+            overflowY: "auto",
+            maxHeight: "15rem",
+            "&::-webkit-scrollbar": {
+              width: "12px",
+              borderRadius: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#F3E4D7",
+              borderRadius: "8px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#D1A890",
+              borderRadius: "8px",
+              border: "2px solid #F3E4D7",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "#B28A73",
+            },
+          }}
+        >
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: "text.secondary",
+            whiteSpace: "pre-wrap" 
+          }}
+        >
           {post.content}
         </Typography>
-      </CardContent>
-      <CardActions disableSpacing>
-        <LikeIcon post={post} />
-        {/* TODO: SHOW ONLY FOR CONNECTED USER POSTS */}
-        {loggrdUser._id == user?._id && (
-          <Button
-            aria-label="edit"
-            onClick={() => setOpenEditPostModal(!openEditPostModal)}
-            sx={{
-              color: "#B05219",
-              "&:focus": { outline: "none" },
-              "&:focus-visible": { outline: "none" },
-            }}
-          >
-            Edit Post
-          </Button>
-        )}
-      </CardActions>
+        </CardContent>
+        <CardActions 
+          disableSpacing 
+          sx={{ 
+            marginTop: "auto",
+            padding: "8px 16px",
+            display: "flex",
+            justifyContent: "space-between",
+            borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+            backgroundColor: "rgba(0, 0, 0, 0.02)",
+            minHeight: "48px"
+          }}
+        >
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <LikeIcon post={post} />
+
+            {loggrdUser._id === user?._id && (
+              <Button
+                aria-label="edit"
+                onClick={() => setOpenEditPostModal(!openEditPostModal)}
+                sx={{
+                  color: "#B05219",
+                  "&:focus": { outline: "none" },
+                  "&:focus-visible": { outline: "none" },
+                  mr: 1,
+                  p: "4px 8px",
+                }}
+              >
+                Edit Post
+              </Button>
+            )}
+          </Box>
+          <Box>
+          </Box>
+        </CardActions>
+      </Box>
       {openEditPostModal && (
         <EditPostPage
           handleClose={() => setOpenEditPostModal(false)}

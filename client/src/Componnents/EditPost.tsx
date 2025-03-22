@@ -22,14 +22,14 @@ import { updatePost } from "../Redux/slices/postsSlice";
 import { useDispatch } from "react-redux";
 import { IPost } from "../interfaces/post";
 
-interface AddPostPageProps {
+interface EditPostPageProps {
   handleClose: () => void;
   post: IPost;
   onSubmitResult?: (success: boolean) => void;
   updatePost: (result: IPost) => void;
 }
 
-export function EditPostPage(props: AddPostPageProps) {
+export function EditPostPage(props: EditPostPageProps) {
   const [title, setTitle] = useState(props.post.title);
   const [content, setContent] = useState(props.post.content);
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -155,7 +155,7 @@ export function EditPostPage(props: AddPostPageProps) {
           }}
         >
           <CardHeader
-            title="Create New Post"
+            title="Edit Post"
             action={
               <IconButton onClick={props.handleClose}>
                 <CloseIcon />
