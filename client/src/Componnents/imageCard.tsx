@@ -4,40 +4,111 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Avatar from "@mui/material/Avatar";
-import IconButton, { IconButtonProps } from "@mui/material/IconButton";
+import { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { red } from "@mui/material/colors";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import { IPost } from "../interfaces/post";
-import { mockUsers } from "../mocData";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
+import { useSelector } from "react-redux";
+import { selectUsers } from "../Redux/slices/usersSlice";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { LikeIcon } from "./like";
+import { EditPostPage } from "./EditPost";
+import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
 
 interface IRecipeReviewCardProps extends IconButtonProps {
   post: IPost;
 }
 
 export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
+  const users = useSelector(selectUsers);
+  const loggrdUser = useSelector(selectLoggedUser);
+  const navigate = useNavigate();
+  const [post, setPost] = useState(props.post);
+  const [user, setUser] = useState(
+    users.find((user) => user._id === post.userId)
+  );
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageNaturalWidth, setImageNaturalWidth] = useState(0);
+  const [imageNaturalHeight, setImageNaturalHeight] = useState(0);
+  const [openEditPostModal, setOpenEditPostModal] = useState(false);
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
+
+  useEffect(() => {
+    setUser(users.find((user) => user._id === post.userId));
+  }, [users, post.userId]);
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setImageNaturalWidth(img.naturalWidth);
+    setImageNaturalHeight(img.naturalHeight);
+    setImageLoaded(true);
+    console.log("1");
+  };
+
+  const handlePostSubmissionResult = (success: boolean) => {
+    setOpenEditPostModal(false);
+    setNotification({
+      open: true,
+      message: success
+        ? "Post updated successfully!"
+        : "Failed to update post. Please try again.",
+      severity: success ? "success" : "error",
+    });
+  };
+
   return (
-    <Card sx={{ width: "40rem", maxHeight: "35rem" }}>
+    <Card sx={{ width: "100%", maxHeight: "35rem", minWidth: "300px" }}>
       <CardHeader
         avatar={
           <Avatar
-            sx={{ bgcolor: red[500] }}
+            sx={{ bgcolor: red[500], cursor: "pointer" }}
             aria-label="recipe"
-            src={
-              mockUsers.find((user) => user.username === props.post.owner)
-                ?.profilePicture
+            src={users.find((user) => user._id === post.userId)?.profilePicture}
+            onClick={() =>
+              navigate(`/profile/${user?._id}`, { state: { user } })
             }
           ></Avatar>
         }
-        title={props.post.title}
+        title={post.title}
       />
-      <CardMedia
-        component="img"
-        height="194"
-        image={props.post.image}
-        alt={props.post.title}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          overflow: "hidden",
+          backgroundColor: "#f5f5f5",
+          minHeight: "194px",
+          maxHeight: "400px",
+          minWidth: "300px",
+        }}
+      >
+        <CardMedia
+          component="img"
+          image={post.image}
+          alt={post.title}
+          onLoad={handleImageLoad}
+          sx={{
+            maxHeight: "400px",
+            width: "auto",
+            maxWidth: "100%",
+            objectFit:
+              imageNaturalWidth < 300 || imageNaturalHeight < 300
+                ? "contain"
+                : "cover",
+            border:
+              imageNaturalWidth < 300 || imageNaturalHeight < 300
+                ? "1px solid #e0e0e0"
+                : "none",
+          }}
+        />
+      </Box>
       <CardContent
         sx={{
           flexGrow: 1,
@@ -62,28 +133,34 @@ export default function RecipeReviewCard(props: IRecipeReviewCardProps) {
         }}
       >
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {props.post.content}
+          {post.content}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
-        
-        {/* TODO: SHOW ONLY FOR CONNEXTED USER POSTS */}
-        <Button
-          aria-label="edit"
-          //  TODO:  onClick={() => setEditMode(!editMode)}
-          sx={{
-            float: "right",
-            color: "#B05219",
-            "&:focus": { outline: "none" },
-            "&:focus-visible": { outline: "none" },
-          }}
-        >
-          Edit Post
-        </Button>
+        <LikeIcon post={post} />
+        {/* TODO: SHOW ONLY FOR CONNECTED USER POSTS */}
+        {loggrdUser._id == user?._id && (
+          <Button
+            aria-label="edit"
+            onClick={() => setOpenEditPostModal(!openEditPostModal)}
+            sx={{
+              color: "#B05219",
+              "&:focus": { outline: "none" },
+              "&:focus-visible": { outline: "none" },
+            }}
+          >
+            Edit Post
+          </Button>
+        )}
       </CardActions>
+      {openEditPostModal && (
+        <EditPostPage
+          handleClose={() => setOpenEditPostModal(false)}
+          onSubmitResult={handlePostSubmissionResult}
+          updatePost={setPost}
+          post={post}
+        />
+      )}
     </Card>
   );
 }

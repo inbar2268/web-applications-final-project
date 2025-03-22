@@ -10,7 +10,7 @@ const router = express.Router();
 dotenv.config();
 
 const base = process.env.DOMAIN_BASE || "http://localhost:3000";
-const uploadDir = path.resolve(__dirname, "../../uploads");
+const uploadDir = path.resolve(process.cwd(), 'uploads'); 
 
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });

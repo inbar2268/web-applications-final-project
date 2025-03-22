@@ -58,6 +58,7 @@ class ChatController {
     }
   }
 
+
   async sendMessage(req: Request, res: Response) {
     try {
       const { chatId } = req.params;

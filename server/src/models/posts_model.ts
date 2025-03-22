@@ -18,13 +18,17 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  Image: {
+  image: {
     type: String,
-    required: false,
+    required: true,
   },
   likedBy: {
     type: [String], 
     default: [], 
+  },
+  commentsCount: {
+    type: Number,
+    default: 0,
   },
 });
 

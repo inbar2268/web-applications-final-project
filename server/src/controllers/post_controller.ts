@@ -21,7 +21,6 @@ class postsController extends BaseController<IPost> {
   
   async create(req: Request, res: Response) {
     const userId = req.body.userId;
-
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       res.status(400).send({ error: "Invalid user ID format" });
       return;

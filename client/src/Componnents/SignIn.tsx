@@ -13,6 +13,10 @@ import {
 import { schema, IFormData } from "../interfaces/signInForm";
 import { useNavigate } from "react-router-dom";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../Redux/slices/loggedUserSlice";
+import { addUser, selectUsers } from "../Redux/slices/usersSlice";
+import { getUserById } from "../services/usersService";
 
 const SignIn: FC = () => {
   const {
@@ -23,6 +27,8 @@ const SignIn: FC = () => {
     resolver: zodResolver(schema),
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const dispatch = useDispatch();
+  const users = useSelector(selectUsers);
 
   const navigate = useNavigate();
 
@@ -31,6 +37,10 @@ const SignIn: FC = () => {
     loginUser(data)
       .then((response) => {
         console.log("login successful:", response);
+        if (response._id)
+          getUserById(response._id).then((response) => {
+            dispatch(login(response));
+          });
         navigate("/");
       })
       .catch((error) => {
@@ -39,20 +49,31 @@ const SignIn: FC = () => {
       });
   };
 
-  const onGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
+  const onGoogleLoginSuccess = async (
+    credentialResponse: CredentialResponse
+  ) => {
     console.log(credentialResponse);
-    try{
-        googleSignIn(credentialResponse);
+    try {
+      googleSignIn(credentialResponse).then((response) => {
+        console.log(response);
+        if (response._id)
+          getUserById(response._id).then((response) => {
+            dispatch(login(response));
+            if (!users.some((user) => user.username === response.username)) {
+              dispatch(addUser(response));
+            }
+          });
         navigate("/");
-    } catch(err){
-        console.error("login failed:", err);
-        setErrorMessage("google sign in falied");
+      });
+    } catch (err) {
+      console.error("login failed:", err);
+      setErrorMessage("google sign in falied");
     }
-  }
+  };
 
   const onGoogleLoginFailure = () => {
     setErrorMessage("google sign in falied");
-  }
+  };
 
   return (
     <Container maxWidth="sm">
@@ -159,17 +180,23 @@ const SignIn: FC = () => {
           <Typography sx={{ px: 2, color: "text.secondary" }}>or</Typography>
         </Divider>
 
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <Box className="google-login-container">
-          <GoogleLogin 
-            onSuccess={onGoogleLoginSuccess} 
-            onError={onGoogleLoginFailure} 
-            shape="pill"
-            size="large"
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            mb: 3,
+          }}
+        >
+          <Box className="google-login-container">
+            <GoogleLogin
+              onSuccess={onGoogleLoginSuccess}
+              onError={onGoogleLoginFailure}
+              shape="pill"
+              size="large"
             />
           </Box>
         </Box>
-
 
         <Box sx={{ textAlign: "center" }}>
           <Typography variant="body1">

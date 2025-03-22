@@ -11,17 +11,43 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Logo from "../assets/Logo.svg";
 import { logout } from "../services/authService";
+import { logout as logoutRedux } from "../Redux/slices/loggedUserSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
+import { Snackbar, Alert } from "@mui/material";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 
-const pages = [{ name: "User", path: "/user" }];
-const settings = ["Sign In", "Logout"];
+// const pages = [{ name: "User", path: "/user" }];
+const pages: { name: string; path: string }[] = [];
+const settings1 = ["Sign In"];
+const settings2 = ["Profile", "Logout"];
 
 function Layout() {
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const user = useSelector(selectLoggedUser);
+  const dispatch = useDispatch();
+  const [settings, setSettings] = useState(settings1);
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error"
+  });
+
+  function emptyUser(): boolean {
+    if (user.username === "" && user.email === "" && user.password === "")
+      return true;
+    else return false;
+  }
+
+  useEffect(() => {
+    if (emptyUser()) setSettings(settings1);
+    else setSettings(settings2);
+  }, [user]);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -38,8 +64,18 @@ function Layout() {
 
   const handleLogoutClick = () => {
     logout();
+    dispatch(logoutRedux());
     navigate("/");
   };
+
+  const handleGenerateRecipe = () => {
+    navigate('/generate-recipe');
+  };
+
+  const handleCloseNotification = () => {
+    setNotification({...notification, open: false});
+  };
+
 
   return (
     <>
@@ -73,7 +109,6 @@ function Layout() {
             >
               sharEat
             </Typography>
-
             <Box
               sx={{
                 flexGrow: 1,
@@ -149,11 +184,26 @@ function Layout() {
                 </Button>
               ))}
             </Box>
-
+            { !emptyUser() &&(
+              <Tooltip title="Generate Recipe">
+                <IconButton
+                  onClick={handleGenerateRecipe}
+                  sx={{
+                    mr: 2,
+                    color: "white",
+                    "&:hover": {
+                      color: "#B05219",
+                    },
+                  }}
+                >
+                  <RestaurantMenuIcon />
+                </IconButton>
+              </Tooltip>
+            )}
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="User" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt="User" src={user?.profilePicture} />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -166,13 +216,15 @@ function Layout() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                  {settings.map((setting) => (
-                  <MenuItem 
-                    key={setting} 
+                {settings.map((setting) => (
+                  <MenuItem
+                    key={setting}
                     onClick={() => {
                       handleCloseUserMenu();
                       if (setting === "Logout") {
                         handleLogoutClick();
+                      } else if (setting === "Profile") {
+                        navigate(`/profile/${user?._id}`, { state: { user } });
                       }
                     }}
                     sx={{
@@ -181,23 +233,28 @@ function Layout() {
                       transition: "all 0.2s ease",
                       padding: "8px 16px",
                       "&:hover": {
-                        backgroundColor: setting === "Logout" ? "rgba(211, 47, 47, 0.08)" : "rgba(25, 118, 210, 0.08)",
+                        backgroundColor:
+                          setting === "Logout"
+                            ? "rgba(211, 47, 47, 0.08)"
+                            : "rgba(25, 118, 210, 0.08)",
                         transform: "translateY(-1px)",
                       },
                     }}
                     component={setting === "Sign In" ? "a" : "li"}
-                    href={setting === "Sign In" ? "/signin" : undefined}>
-                    <Typography 
-                      sx={{ 
-                        textAlign: "center", 
+                    href={setting === "Sign In" ? "/signin" : undefined}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
                         fontWeight: 500,
-                        color: setting === "Logout" ? "error.main" : "text.primary",
+                        color:
+                          setting === "Logout" ? "error.main" : "text.primary",
                       }}
                     >
                       {setting}
                     </Typography>
-                </MenuItem>
-              ))}
+                  </MenuItem>
+                ))}
               </Menu>
             </Box>
           </Toolbar>
@@ -206,6 +263,29 @@ function Layout() {
       <Box sx={{ mt: 8 }}>
         <Outlet />
       </Box>
+
+
+      <Snackbar 
+        open={notification.open} 
+        autoHideDuration={6000} 
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseNotification} 
+          severity={notification.severity}
+          sx={{ 
+            width: '100%',
+            backgroundColor: notification.severity === 'success' ? '#EDF7ED' : '#FDEDED',
+            color: notification.severity === 'success' ? '#1E4620' : '#5F2120',
+            '& .MuiAlert-icon': {
+              color: notification.severity === 'success' ? '#4CAF50' : '#EF5350'
+            }
+          }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
