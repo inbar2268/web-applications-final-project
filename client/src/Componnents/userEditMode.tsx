@@ -40,23 +40,25 @@ function UserEditMode(props: IUserEditModeProps) {
     if (fileInputRef.current?.files?.[0]) {
       try {
         const imageUrl = await uploadImg(fileInputRef.current.files[0]);
-
+        console.log(imageUrl);
         if (!imageUrl) {
           console.error("Image upload failed");
           return;
         }
         const updatedUser = { ...user, profilePicture: imageUrl };
+        editUser(user._id, updatedUser);
+        dispatch(updateLoggedUser(updatedUser));
+        dispatch(updateUser(updatedUser));
         props.onCheck(updatedUser);
       } catch (error) {
         console.error("Upload profile picture failed:", error);
       }
     } else {
+      editUser(user._id, user);
+      dispatch(updateLoggedUser(user));
+      dispatch(updateUser(user));
       props.onCheck(user);
     }
-
-    editUser(user._id, user);
-    dispatch(updateLoggedUser(user));
-    dispatch(updateUser(user));
   };
   return (
     <>
