@@ -306,17 +306,19 @@ const ChatPage: React.FC = () => {
 
               {otherUser && (
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Avatar
-                    sx={{
-                      bgcolor: primaryColor,
-                      width: 40,
-                      height: 40,
-                      mr: 1.5,
-                      color: "white",
-                    }}
-                  >
-                    {otherUser.username?.charAt(0).toUpperCase() || "U"}
-                  </Avatar>
+                    <Avatar
+                      alt={otherUser.username || "User"}
+                      src={otherUser?.profilePicture}
+                      sx={{
+                        bgcolor: primaryColor,
+                        width: 40,
+                        height: 40,
+                        mr: 1.5,
+                        color: "white",
+                      }}
+                    >
+                      {!otherUser?.profilePicture && (otherUser.username?.charAt(0).toUpperCase() || "U")}
+                    </Avatar>
                   <Box>
                     <Typography
                       variant="h6"
@@ -376,6 +378,8 @@ const ChatPage: React.FC = () => {
                     >
                       {isCurrentUser && (
                         <Avatar
+                          alt={currentUser.username || "User"}
+                          src={currentUser?.profilePicture}
                           sx={{
                             bgcolor: secondaryColor,
                             width: 32,
@@ -385,7 +389,7 @@ const ChatPage: React.FC = () => {
                             color: "white",
                           }}
                         >
-                          {currentUser.username?.charAt(0).toUpperCase() || "U"}
+                          {!currentUser?.profilePicture && (currentUser.username?.charAt(0).toUpperCase() || "U")}
                         </Avatar>
                       )}
                       <Box sx={{ maxWidth: { xs: "70%", sm: "60%" } }}>
@@ -421,6 +425,8 @@ const ChatPage: React.FC = () => {
                       </Box>
                       {!isCurrentUser && (
                         <Avatar
+                          alt={otherUser?.username || "User"}
+                          src={otherUser?.profilePicture}
                           sx={{
                             bgcolor: primaryColor,
                             width: 32,
@@ -430,7 +436,7 @@ const ChatPage: React.FC = () => {
                             color: "white",
                           }}
                         >
-                          {otherUser?.username?.charAt(0).toUpperCase() || "U"}
+                          {!otherUser?.profilePicture && (otherUser?.username?.charAt(0).toUpperCase() || "U")}
                         </Avatar>
                       )}
                     </Box>
