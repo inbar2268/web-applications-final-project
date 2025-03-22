@@ -3,7 +3,6 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { io, Socket } from "socket.io-client";
 import { selectLoggedUser } from "../Redux/slices/loggedUserSlice";
-import apiClient from "../services/apiClient";
 import {
   Box,
   Paper,
@@ -16,9 +15,9 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendIcon from "@mui/icons-material/Send";
-import IMessage from "../interfaces/message.ts";
-import IChat from "../interfaces/chat.ts";
-import IUser from "../interfaces/user.ts";
+import {IMessage} from "../interfaces/message.ts";
+import {IChat} from "../interfaces/chat.ts";
+import {IUser} from "../interfaces/user.ts";
 import {
   getUserChats,
   getUserById,
