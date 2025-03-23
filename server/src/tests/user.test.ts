@@ -152,3 +152,105 @@ describe("User Controller API Tests", () => {
     expect(response.statusCode).toBe(404);
   });
 });
+
+test("Fail to get user with invalid ObjectId", async () => {
+  const response = await request(app).get("/users/invalid-id");
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe("Invalid user ID format");
+});
+
+test("Fail to get user with invalid ObjectId", async () => {
+  const response = await request(app).get("/users/invalid-id");
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe("Invalid user ID format");
+});
+
+test("Fail to update non-existing user", async () => {
+  const nonExistentId = new mongoose.Types.ObjectId().toString();
+  const response = await request(app)
+    .put(`/users/${nonExistentId}`)
+    .set({ authorization: `JWT ${secondTestUser.token}` })
+    .send({ username: "ghostUser", profilePicture: "ghost.jpg" });
+
+  expect(response.statusCode).toBe(404);
+  expect(response.text).toBe("User not found");
+});
+
+test("Fail to update user without token", async () => {
+  const response = await request(app)
+    .put(`/users/${secondTestUser._id}`)
+    .send({ username: "unauthorizedUser" });
+
+  expect(response.statusCode).toBe(401); // Depends on your authMiddleware
+});
+
+test("Fail to delete user without token", async () => {
+  const response = await request(app).delete(`/users/${secondTestUser._id}`);
+  expect(response.statusCode).toBe(401);
+});
+
+test("Get all users (after creating users)", async () => {
+  const response = await request(app).get("/users");
+  expect(response.statusCode).toBe(200);
+  expect(Array.isArray(response.body)).toBeTruthy();
+  expect(response.body.length).toBeGreaterThanOrEqual(1);
+});
+
+test("getByUsername handles server error", async () => {
+  const spy = jest
+    .spyOn(userModel, "findOne")
+    .mockImplementationOnce(() => {
+      throw new Error("DB failure");
+    });
+
+  const response = await request(app).get(`/users/username/${secondTestUser.username}`);
+  expect(response.statusCode).toBe(500);
+  expect(response.body.error).toBe("Server error");
+
+  spy.mockRestore();
+});
+
+test("getById handles server error", async () => {
+  const spy = jest
+    .spyOn(userModel, "findById")
+    .mockImplementationOnce(() => {
+      throw new Error("DB crash");
+    });
+
+  const response = await request(app).get(`/users/${secondTestUser._id}`);
+  expect(response.statusCode).toBe(500);
+  expect(response.body.error).toBe("Server error");
+
+  spy.mockRestore();
+});
+
+test("update handles server error", async () => {
+  const spy = jest
+    .spyOn(userModel, "findByIdAndUpdate")
+    .mockImplementationOnce(() => {
+      throw new Error("Update failure");
+    });
+
+  const response = await request(app)
+    .put(`/users/${secondTestUser._id}`)
+    .set({ authorization: `JWT ${secondTestUser.token}` })
+    .send({ username: "willCrash" });
+
+  expect(response.statusCode).toBe(400); // Based on your catch block
+  spy.mockRestore();
+});
+
+test("deleteItem handles server error", async () => {
+  const spy = jest
+    .spyOn(userModel, "findByIdAndDelete")
+    .mockImplementationOnce(() => {
+      throw new Error("Delete failed");
+    });
+
+  const response = await request(app)
+    .delete(`/users/${secondTestUser._id}`)
+    .set({ authorization: `JWT ${secondTestUser.token}` });
+
+  expect(response.statusCode).toBe(400); 
+  spy.mockRestore();
+});

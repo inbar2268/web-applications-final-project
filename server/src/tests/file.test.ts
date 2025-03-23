@@ -81,3 +81,12 @@ describe("File Upload Tests", () => {
     expect(uploadResponse.body.error).toBe("Only images (jpeg, png, gif, webp) are allowed.");
   });
 });
+test("Fail to upload when no file is attached", async () => {
+  const response = await request(app)
+    .post("/file")
+    .set("Authorization", "JWT " + accessToken); // Valid token, no file
+
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe("Only images (jpeg, png, gif, webp) are allowed.");
+});
+

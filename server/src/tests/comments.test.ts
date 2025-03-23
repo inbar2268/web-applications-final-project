@@ -130,3 +130,120 @@ describe("Comments Tests", () => {
     expect(response.statusCode).toBe(400);
   });
 });
+test("Fail to get comments by invalid postId format", async () => {
+  const response = await request(app).get("/comments/post/invalid-id");
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe("Invalid post ID format");
+});
+
+test("Fail to get comments for a valid postId with no comments", async () => {
+  const emptyPostId = new mongoose.Types.ObjectId().toString();
+  const response = await request(app).get(`/comments/post/${emptyPostId}`);
+  expect(response.statusCode).toBe(404);
+  expect(response.body.error).toBe("No comments found for this post");
+});
+
+test("Fail to get comment by invalid ID format", async () => {
+  const response = await request(app).get("/comments/invalid-id");
+  expect(response.statusCode).toBe(400);
+});
+
+test("Fail to get comment by valid non-existing ID", async () => {
+  const fakeId = new mongoose.Types.ObjectId().toString();
+  const response = await request(app).get(`/comments/${fakeId}`);
+  expect(response.statusCode).toBe(404);
+});
+
+test("Fail to delete comment that does not exist", async () => {
+  const fakeId = new mongoose.Types.ObjectId().toString();
+  const response = await request(app)
+    .delete(`/comments/${fakeId}`)
+    .set("Authorization", `Bearer ${accessToken}`);
+  expect(response.statusCode).toBe(404);
+});
+
+test("Fail to delete comment without token", async () => {
+  const response = await request(app).delete(`/comments/${new mongoose.Types.ObjectId()}`);
+  expect(response.statusCode).toBe(401);
+});
+
+test("Fail to create comment with missing fields", async () => {
+  const response = await request(app)
+    .post("/comments")
+    .set("Authorization", `Bearer ${accessToken}`)
+    .send({ comment: "Missing userId and postId" });
+
+  expect(response.statusCode).toBe(400);
+});
+
+test("getByPostId handles server error", async () => {
+  const spy = jest
+    .spyOn(commentsModel, "find")
+    .mockImplementationOnce(() => {
+      throw new Error("DB error");
+    });
+
+  const response = await request(app).get(`/comments/post/${testPostId}`);
+  expect(response.statusCode).toBe(500);
+  expect(response.body.error).toBe("Server error");
+
+  spy.mockRestore();
+});
+
+test("Create comment handles DB error", async () => {
+  const spy = jest
+    .spyOn(commentsModel, "create")
+    .mockImplementationOnce(() => {
+      throw new Error("DB error");
+    });
+
+  const response = await request(app)
+    .post("/comments")
+    .set("Authorization", `Bearer ${accessToken}`)
+    .send({
+      comment: "DB failure test",
+      userId: testUserId,
+      postId: testPostId,
+    });
+
+  expect(response.statusCode).toBe(400);
+  spy.mockRestore();
+});
+
+test("Fail to update post when comment is created", async () => {
+  const spy = jest
+    .spyOn(commentsModel, "findByIdAndUpdate")
+    .mockImplementationOnce(() => {
+      throw new Error("Post update failure");
+    });
+
+  const response = await request(app)
+    .post("/comments")
+    .set("Authorization", `Bearer ${accessToken}`)
+    .send({
+      comment: "New comment but post update fails",
+      userId: testUserId,
+      postId: testPostId,
+    });
+
+  expect(response.statusCode).toBe(201);
+  expect(response.body.comment).toBe("New comment but post update fails");
+
+  spy.mockRestore();
+});
+
+test("deleteItem handles DB error", async () => {
+  const fakeId = new mongoose.Types.ObjectId().toString();
+  const spy = jest
+    .spyOn(commentsModel, "findByIdAndDelete")
+    .mockImplementationOnce(() => {
+      throw new Error("DB error on delete");
+    });
+
+  const response = await request(app)
+    .delete(`/comments/${fakeId}`)
+    .set("Authorization", `Bearer ${accessToken}`);
+
+  expect(response.statusCode).toBe(400);
+  spy.mockRestore();
+});

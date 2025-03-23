@@ -196,3 +196,60 @@ test("Fail to get chats without authentication", async () => {
     });
     
 });
+test("Fail to create chat with same user for both participants", async () => {
+  const response = await request(app)
+    .post("/chats")
+    .set("Authorization", "JWT " + accessToken)
+    .send({ userId1: testUserId, userId2: testUserId });
+
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe("Invalid participant IDs");
+});
+
+test("Fail to create chat with missing userId2", async () => {
+  const response = await request(app)
+    .post("/chats")
+    .set("Authorization", "JWT " + accessToken)
+    .send({ userId1: testUserId }); // missing userId2
+
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe("Invalid participant IDs");
+});
+
+test("Fail to send message with empty message string", async () => {
+  const response = await request(app)
+    .post(`/chats/${chatId}/messages`)
+    .set("Authorization", "JWT " + accessToken)
+    .send({
+      chatId,
+      senderId: testUserId,
+      receiverId: testUser2Id,
+      message: "   ", // whitespace only
+    });
+
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe("Chat ID, Sender ID, Receiver ID, and message are required");
+});
+
+test("Fail to send message with invalid chatId format", async () => {
+  const response = await request(app)
+    .post("/chats/invalidChatId/messages")
+    .set("Authorization", "JWT " + accessToken)
+    .send({
+      senderId: testUserId,
+      receiverId: testUser2Id,
+      message: "Invalid chat ID format",
+    });
+});
+test("Fail to send message with missing senderId", async () => {
+  const res = await request(app)
+    .post(`/chats/${chatId}/messages`)
+    .set("Authorization", "JWT " + accessToken)
+    .send({
+      receiverId: testUser2Id,
+      message: "Missing sender",
+    });
+
+  expect(res.statusCode).toBe(400);
+});
+
