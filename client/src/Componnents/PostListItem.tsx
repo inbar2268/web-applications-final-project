@@ -79,6 +79,13 @@ import {
                     '&:hover': {
                       color: '#ff5252',
                     },
+                    '&:focus': {
+                      outline: 'none',
+                      border: 'none',  
+                    },
+                    '&:active': {
+                      boxShadow: 'none',
+                    },
                   }}
                 >
                   <DeleteIcon />

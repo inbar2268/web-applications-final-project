@@ -35,7 +35,7 @@ function Layout() {
   const [notification, setNotification] = useState({
     open: false,
     message: "",
-    severity: "success" as "success" | "error"
+    severity: "success" as "success" | "error",
   });
 
   function emptyUser(): boolean {
@@ -69,13 +69,12 @@ function Layout() {
   };
 
   const handleGenerateRecipe = () => {
-    navigate('/generate-recipe');
+    navigate("/generate-recipe");
   };
 
   const handleCloseNotification = () => {
-    setNotification({...notification, open: false});
+    setNotification({ ...notification, open: false });
   };
-
 
   return (
     <>
@@ -97,7 +96,7 @@ function Layout() {
               to="/"
               sx={{
                 mr: 2,
-                display: { xs: "none", md: "flex" },
+                display: { md: "flex" },
                 fontFamily: "monospace",
                 fontWeight: 700,
                 letterSpacing: ".3rem",
@@ -109,63 +108,7 @@ function Layout() {
             >
               sharEat
             </Typography>
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: {
-                  xs: "flex",
-                  md: "none",
-                },
-              }}
-            >
-              <IconButton
-                size="large"
-                aria-label="menu"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-                keepMounted
-                transformOrigin={{ vertical: "top", horizontal: "left" }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: "block", md: "none" },
-                }}
-              >
-                {pages.map((page) => (
-                  <MenuItem
-                    key={page.name}
-                    onClick={handleCloseNavMenu}
-                    component={Link}
-                    to={page.path}
-                    sx={{
-                      fontFamily: "monospace",
-                      "&:hover": {
-                        color: "#B05219",
-                      },
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        textAlign: "center",
-                      }}
-                    >
-                      {page.name}
-                    </Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "flex" } }}>
               {pages.map((page) => (
                 <Button
                   key={page.name}
@@ -184,7 +127,7 @@ function Layout() {
                 </Button>
               ))}
             </Box>
-            { !emptyUser() &&(
+            {!emptyUser() && (
               <Tooltip title="Generate Recipe">
                 <IconButton
                   onClick={handleGenerateRecipe}
@@ -264,23 +207,24 @@ function Layout() {
         <Outlet />
       </Box>
 
-
-      <Snackbar 
-        open={notification.open} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
         onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert 
-          onClose={handleCloseNotification} 
+        <Alert
+          onClose={handleCloseNotification}
           severity={notification.severity}
-          sx={{ 
-            width: '100%',
-            backgroundColor: notification.severity === 'success' ? '#EDF7ED' : '#FDEDED',
-            color: notification.severity === 'success' ? '#1E4620' : '#5F2120',
-            '& .MuiAlert-icon': {
-              color: notification.severity === 'success' ? '#4CAF50' : '#EF5350'
-            }
+          sx={{
+            width: "100%",
+            backgroundColor:
+              notification.severity === "success" ? "#EDF7ED" : "#FDEDED",
+            color: notification.severity === "success" ? "#1E4620" : "#5F2120",
+            "& .MuiAlert-icon": {
+              color:
+                notification.severity === "success" ? "#4CAF50" : "#EF5350",
+            },
           }}
         >
           {notification.message}
