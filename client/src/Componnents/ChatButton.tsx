@@ -75,6 +75,13 @@ const ChatButton: React.FC<ChatButtonProps> = ({ userId, className = '' }) => {
           '&:hover': {
             bgcolor: secondaryColor,
           },
+          '&:focus': {
+            outline: 'none',
+            border: 'none',  
+          },
+          '&:active': {
+            boxShadow: 'none',
+          },
           borderRadius: '8px',
           textTransform: 'none',
           px: 2,
@@ -85,6 +92,7 @@ const ChatButton: React.FC<ChatButtonProps> = ({ userId, className = '' }) => {
             bgcolor: 'rgba(232, 176, 142, 0.5)',
             color: 'white',
           }
+          
         }}
       >
         {loading ? 'Connecting...' : 'Message'}
